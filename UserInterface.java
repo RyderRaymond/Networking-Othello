@@ -6,4 +6,11 @@
  */
 public class UserInterface {
     private int boardState[][]; // 2d array to hold the board state that will be displayed to the player
+
+    /*
+     * method to update the board based on a list of coordinates
+     */
+    public void updateBoardState(int[][] uCoords) {
+
+    }
 }
