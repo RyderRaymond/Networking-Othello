@@ -18,6 +18,10 @@ public class UserInterface {
      * method to update the board based on a list of coordinates
      */
     private void updateBoardState(int[][] uCoords) {
-
+        for(int x,y,i = 0; i < uCoords.length; i++) {
+            x = uCoords[i][0];
+            y = uCoords[i][1];
+            boardState[x][y] = uCoords[i][3];
+        }
     }
 }
