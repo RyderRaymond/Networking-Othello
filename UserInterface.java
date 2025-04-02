@@ -10,7 +10,7 @@ public class UserInterface {
     /*
      * method to update the board based on a list of coordinates
      */
-    public void updateBoardState(int[][] uCoords) {
+    private void updateBoardState(int[][] uCoords) {
 
     }
 }
