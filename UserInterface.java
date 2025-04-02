@@ -9,7 +9,7 @@ public class UserInterface {
 
     // constructor
     public UserInterface() {
-        boardState = new int[][]{
+        boardState = new int[][] {
             {0,0,0,0,0,0,0,0},
             {0,0,0,0,0,0,0,0},
             {0,0,0,0,0,0,0,0},
