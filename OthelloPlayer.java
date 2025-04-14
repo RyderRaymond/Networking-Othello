@@ -38,7 +38,7 @@ public class OthelloPlayer {
 
   public static int[][] getMoves(Color[][] board, Color color) { // Returns all legal moves for the given color
     return new int[][]{{0, 0}}; // Placeholder for actual move logic
-    // return {{-1, -1}}; // Placeholder for no moves available
+    // return {{-1, 0}}; // Placeholder for no moves available
   }
 
   public static int bestOutcome(Color[][] board, Color color) { // Returns the best outcome for the given color
