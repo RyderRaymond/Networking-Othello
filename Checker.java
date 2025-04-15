@@ -1,7 +1,8 @@
+import java.util.ArrayList;
 public class Checker { // clientside class that checks the player's moves
   public Color playerColor; // color of the player
   public Color[][] board; // board state
-  public int[][] moves; // list of legal moves
+  public ArrayList<int[]> moves; // list of legal moves
 
   public static final Color EMPTY = Color.EMPTY; // Define EMPTY as a constant
   public static final Color PLAYER = Color.PLAYER; // Define PLAYER as a constant
@@ -34,7 +35,18 @@ public class Checker { // clientside class that checks the player's moves
   }
 
   public void validMoves() { //updates the list of legal moves
-    // this.moves = {{-1, 0}}; // no moves available
+    ArrayList<int[]> validMoves = new ArrayList<>();
+    for (int i = 0; i < 8; i++) {
+      for (int j = 0; j < 8; j++) {
+        if (board[i][j] == EMPTY) { // Check if the tile is empty
+          int[] coord = {i, j};
+          if (checkValidity(coord)) { // Check if the move is valid
+            validMoves.add(coord);
+          }
+        }
+      }
+    }
+    moves = validMoves; // Initialize moves array with the size of validMoves
   }
 
   public void setBoard(Color[][] board) { // updates the board state
