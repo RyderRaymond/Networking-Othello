@@ -75,6 +75,13 @@ public class UserInterface extends JFrame implements KeyListener {
     }
 
     /*
+     * method to submit the selection
+     */
+    public void submitCoordinates() {
+
+    }
+
+    /*
      * method to update the board state based on a list of coordinates
      */
     private void updateBoardState(int[][] uCoords) {
@@ -150,6 +157,7 @@ public class UserInterface extends JFrame implements KeyListener {
                 break;
             // enter
             case 10:
+                submitCoordinates();
                 break;
             default:
                 break;
