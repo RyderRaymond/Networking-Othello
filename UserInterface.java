@@ -78,7 +78,13 @@ public class UserInterface extends JFrame implements KeyListener {
      * method to submit the selection
      */
     public void submitCoordinates() {
+        // notify 
+        serverMessage.setText("Submitting...");
 
+        // call checker
+
+        // await server
+        serverMessage.setText("Awaiting Server...");
     }
 
     /*
