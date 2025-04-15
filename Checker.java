@@ -13,6 +13,7 @@ public class Checker { // clientside class that checks the player's moves
   }
 
   public void validMoves() { //updates the list of legal moves
+    // this.moves = {{-1, 0}}; // no moves available
   }
 
   public void setBoard(Color[][] board) { // updates the board state
