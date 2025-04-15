@@ -3,7 +3,7 @@ public class Checker { // clientside class that checks the player's moves
   public Color[][] board; // board state
   public int[][] moves; // list of legal moves
 
-  public Checker(Color playerColor, Color[][] board) {
+  Checker(Color playerColor, Color[][] board) {
     this.playerColor = playerColor;
     this.board = board;
   }
@@ -25,6 +25,11 @@ public class Checker { // clientside class that checks the player's moves
   }
 
   public void updateBoard(int[][] changes) { // given the array of changed tiles, update the board
-
+    for (int[] change: changes){
+      int x = change[0];
+      int y = change[1];
+      Color color = Color.values()[change[2]];
+      board[x][y] = color;
+    }
   }
 }
