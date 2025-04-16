@@ -15,8 +15,6 @@ public class OthelloPlayer {
     {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
     {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY}};
   // 1=white, 2=black, 0=empty
-  public int numWhite = 2;
-  public int numBlack = 2;
 
   OthelloPlayer(Color color) {
     this.color = color;
@@ -30,33 +28,61 @@ public class OthelloPlayer {
     return board;
   }
 
-  public int getNumWhite() {
-    return numWhite;
+  public static int count(Color[][] board, Color color) { // Counts the number of pieces of the given color on the board
+    int count = 0;
+    for (int i = 0; i < 8; i++) {
+      for (int j = 0; j < 8; j++) {
+        if (board[i][j] == color) {
+          count++;
+        }
+      }
+    }
+    return count;
   }
 
-  public int getNumBlack() {
-    return numBlack;
-  }
-
-  public static int[][] getMoves(Color[][] board, Color color) { // Returns all legal moves for the given color
-    return new int[][]{{0, 0}}; // Placeholder for actual move logic
-    // return {{-1, 0}}; // Placeholder for no moves available
+  public static ArrayList<int[]> getMoves(Color[][] board, Color color) { // Returns all legal moves for the given color
+    ArrayList<int[]> validMoves = new ArrayList<>();
+    for (int i = 0; i < 8; i++) {
+      for (int j = 0; j < 8; j++) {
+        if (board[i][j] == EMPTY) { // Check if the tile is empty
+          int[] coord = {i, j};
+          if (isValidMove(board, coord, color)) { // Check if the move is valid
+            validMoves.add(coord);
+          }
+        }
+      }
+      if(validMoves.isEmpty()) {
+        validMoves.add(new int[]{-1, 0}); // No valid moves available
+      }
+    }
+    return validMoves;
   }
 
   public static int bestOutcome(Color[][] board, Color color) { // Returns the best outcome for the given color
-    // Outcomes should equal the number of tiles flipped, plus ten if the corner is captured
-    // call getMoves and calculate the outcome for each move
-    // return the best outcome
-    return 0; // Placeholder for actual outcome logic
+    ArrayList<int[]> moves = getMoves(board, color);
+    int bestOutcome = 0;
+    if (moves.get(0)[0] == -1) return 0; // No valid moves available
+    for (int[] move : moves) {
+      int outcome = 0;
+      if(isCorner(move)) outcome += 10; // Corner captured
+      if(isEdge(move)) outcome += 5; // Edge captured
+      if(isNextToCorner(move)) outcome -= 15; // Next to corner
+      ArrayList<int[]> changes = place(board, move, color); // get changed tiles
+      Color[][] newBoard = updateBoard(board, changes); // update the board
+      outcome += count(newBoard, color) - count(newBoard, color == PLAYER ? AI : PLAYER);
+      if (outcome > bestOutcome) bestOutcome = outcome; // Update best outcome
+      // Compare outcomes and return the best one
+    }
+    return bestOutcome; // Placeholder for actual outcome logic
   }
 
-  public ArrayList<ArrayList<Integer>> place(int[] coord) { // Places a piece on the board at the given coordinates, assumes valid move
-    ArrayList<ArrayList<Integer>> changes = new ArrayList<>();
+  public static ArrayList<int[]> place(Color[][] board, int[] coord, Color color) { // returns the array of changed tiles
+    ArrayList<int[]> changes = new ArrayList<>();
     int[] placedTile = coord;
-    ArrayList<Integer> change = new ArrayList<>();
-    change.add(placedTile[0]);
-    change.add(placedTile[1]);
-    change.add(color.ordinal());
+    int[] change = new int[3];
+    change[0] = placedTile[0];
+    change[1] = placedTile[1];
+    change[2] = color.ordinal();
     changes.add(change);
 
     // Check all 8 directions for pieces to flip
@@ -65,18 +91,17 @@ public class OthelloPlayer {
         if (x == 0 && y == 0) continue; // Skip the current tile
         int i = placedTile[0] + x;
         int j = placedTile[1] + y;
-        ArrayList<Integer> flip = new ArrayList<>();
+        int[] flip = new int[3];
         while (i >= 0 && i < 8 && j >= 0 && j < 8) {
           if (board[i][j] == EMPTY) break; // No pieces to flip
           if (board[i][j] == color) {
             // Flip the pieces in the direction of the move
             for (int k = 1; k <= Math.abs(i - placedTile[0]); k++) { // here, i-placedTile[0] is the number of pieces to flip
-              flip.add(placedTile[0] + k * x);
-              flip.add(placedTile[1] + k * y);
-              flip.add(color.ordinal());
-              board[placedTile[0] + k * x][placedTile[1] + k * y] = color; // Flip the piece
+              flip[0] = placedTile[0] + k * x;
+              flip[1] = placedTile[1] + k * y;
+              flip[2] = color.ordinal();
+              changes.add(flip);
             }
-            changes.add(flip);
             break;
           }
           i += x;
@@ -87,6 +112,26 @@ public class OthelloPlayer {
 
     return changes;
     // return a list of coordinates of the pieces changed {x, y, color}
+    // must call updateBoard(changes) to update the board
+  }
+
+  public void updateBoard(ArrayList<int[]> changes) { // given the array of changed tiles, update the board
+    for (int[] change: changes){
+      int x = change[0];
+      int y = change[1];
+      Color color = Color.values()[change[2]];
+      board[x][y] = color;
+    }
+  }
+
+  public static Color[][] updateBoard(Color[][] board, ArrayList<int[]> changes) { // given the array of changed tiles, update the board
+    for (int[] change: changes){
+      int x = change[0];
+      int y = change[1];
+      Color color = Color.values()[change[2]];
+      board[x][y] = color;
+    }
+    return board;
   }
 
   public static boolean isValidMove(Color[][] aBoard, int[] coord, Color aColor) { // Checks if a move on a given board is valid
@@ -111,15 +156,32 @@ public class OthelloPlayer {
   }
 
   public static boolean isCorner(int[] coord) { // Checks if the move is in a corner
-    return false; // Placeholder for actual corner check logic
+    if (coord[0] == 0 && coord[1] == 0) return true; // Top left corner
+    if (coord[0] == 0 && coord[1] == 7) return true; // Top right corner
+    if (coord[0] == 7 && coord[1] == 0) return true; // Bottom left corner
+    if (coord[0] == 7 && coord[1] == 7) return true; // Bottom right corner
+    return false;
   }
 
   public static boolean isEdge(int[] coord) { // Checks if the move is on an edge
-    return false; // Placeholder for actual edge check logic
+    if (coord[0] == 0) return true; // Top edge
+    if (coord[0] == 7) return true; // Bottom edge
+    if (coord[1] == 0) return true; // Left edge
+    if (coord[1] == 7) return true; // Right edge
+    return false;
   }
 
   public static boolean isNextToCorner(int[] coord) { // Checks if the move is next to a corner
-    return false; // Placeholder for actual next to corner check logic
+    if (coord[0] == 0){
+      if (coord[1] == 1 || coord[1] == 6) return true;
+    } else if (coord[0] == 7){
+      if (coord[1] == 1 || coord[1] == 6) return true;
+    } else if (coord[0] == 1){
+      if (coord[1] == 0 || coord[0] == 1 || coord[1] == 6 || coord[1] == 7) return true;
+    } else if (coord[0] == 6){
+      if (coord[1] == 0 || coord[0] == 1 || coord[1] == 6 || coord[1] == 7) return true;
+    }
+    return false;
   }
 
   public static Color winner(Color[][] board) { // Checks if there is a winner

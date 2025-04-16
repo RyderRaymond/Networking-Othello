@@ -46,6 +46,9 @@ public class Checker { // clientside class that checks the player's moves
         }
       }
     }
+    if(validMoves.isEmpty()) {
+      validMoves.add(new int[]{-1, 0}); // No valid moves available
+    }
     moves = validMoves; // Initialize moves array with the size of validMoves
   }
 
