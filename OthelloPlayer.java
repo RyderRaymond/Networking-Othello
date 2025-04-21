@@ -1,9 +1,9 @@
 import java.util.ArrayList;
 
 public class OthelloPlayer {
-  public static final Color EMPTY = Color.EMPTY; // Define EMPTY as a constant
-  public static final Color PLAYER = Color.PLAYER; // Define PLAYER as a constant
-  public static final Color AI = Color.AI; // Define AI as a constant
+  public static final Color EMPTY = Color.EMPTY;
+  public static final Color PLAYER = Color.PLAYER;
+  public static final Color AI = Color.AI;
   public Color color;
   public Color[][] board = new Color[][] {
     {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
@@ -14,7 +14,6 @@ public class OthelloPlayer {
     {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
     {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
     {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY}};
-  // 1=white, 2=black, 0=empty
 
   OthelloPlayer(Color color) {
     this.color = color;
