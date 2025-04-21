@@ -72,7 +72,7 @@ public class OthelloPlayer {
       if (outcome > bestOutcome) bestOutcome = outcome; // Update best outcome
       // Compare outcomes and return the best one
     }
-    return bestOutcome; // Placeholder for actual outcome logic
+    return bestOutcome;
   }
 
   public static ArrayList<int[]> place(Color[][] board, int[] coord, Color color) { // returns the array of changed tiles
