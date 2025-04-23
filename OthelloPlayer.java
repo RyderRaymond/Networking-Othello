@@ -25,7 +25,7 @@ public class OthelloPlayer {
 
   public Color[][] getBoard() {
     return board;
-  }
+  } //comment
 
   public static int count(Color[][] board, Color color) { // Counts the number of pieces of the given color on the board
     int count = 0;
