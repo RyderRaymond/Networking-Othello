@@ -8,6 +8,18 @@ public class Checker { // clientside class that checks the player's moves
   public static final Color PLAYER = Color.PLAYER; // Define PLAYER as a constant
   public static final Color AI = Color.AI; // Define AI as a constant
 
+  Checker() {
+    board = new Color[][] {
+      {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
+      {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
+      {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
+      {EMPTY, EMPTY, EMPTY, PLAYER, AI, EMPTY, EMPTY, EMPTY},
+      {EMPTY, EMPTY, EMPTY, AI, PLAYER, EMPTY, EMPTY, EMPTY},
+      {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
+      {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
+      {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY}};
+    playerColor = PLAYER;
+  }
   Checker(Color playerColor, Color[][] board) {
     this.playerColor = playerColor;
     this.board = board;
