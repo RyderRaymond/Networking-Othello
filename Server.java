@@ -163,7 +163,30 @@ class ServerThread extends Thread {
     // AI logic
     // Return coord to play
     private int[] makeServerMove() {
-        return new int[] {};
+      ArrayList<int[]> moves = OthelloPlayer.getMoves(aiPlayer.getBoard(), aiColor);
+      if (moves.get(0)[0] == -1) return new int[]{-1, 0}; // No valid moves available
+      int bestMove = -1;
+      int bestWeight = 0;
+      int[] weights = new int[moves.size()];
+      for (int i = 0; i < moves.size(); i++) {
+          int[] move = moves.get(i);
+          ArrayList<int[]> updatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), move, aiColor);
+          Color[][] nextBoard = OthelloPlayer.updateBoard(aiPlayer.getBoard(), updatedCoords);
+
+          int weight = OthelloPlayer.count(nextBoard, aiColor);
+          if (OthelloPlayer.isCorner(move)) weight += 10;
+          if (OthelloPlayer.isEdge(move)) weight += 5;
+          if (OthelloPlayer.isNextToCorner(move)) weight -= 15;
+
+          weight -= OthelloPlayer.bestOutcome(nextBoard, Color.PLAYER);
+
+          weights[i] = weight;
+          if (weight > bestWeight) {
+              bestWeight = weight;
+              bestMove = i;
+          }
+      }
+      return moves.get(bestMove);
     }
 
 
