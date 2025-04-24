@@ -1,6 +1,6 @@
-import java.util.ArrayList;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Server {
@@ -48,8 +48,8 @@ public class Server {
 }
 
 class ServerThread extends Thread {
-    private Color[][] board = new Color[8][8];
-    private final Color serverColor = Color.AI;
+    private final Color aiColor = Color.AI;
+    private OthelloPlayer aiPlayer;
     private BufferedReader reader;
     private BufferedWriter writer;
     private Socket clientSocket;
@@ -58,30 +58,61 @@ class ServerThread extends Thread {
         this.reader = reader;
         this.writer = writer;
         this.clientSocket = clientSocket;
+        this.aiPlayer = new OthelloPlayer(aiColor);
     }
 
-    public void run() {}
+    public void run() {
+        int[] lastMove = null;
+        int[] playerCoord = getPlayerMove();
 
-    private void get_player_move() {
+        // Check if last move was pass and player move is pass then game is over
 
+        ArrayList<int[]> playerUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), playerCoord, aiColor);
+        aiPlayer.updateBoard(playerUpdatedCoords);
+
+        // Send playerUpdatedCoords to player
     }
 
-    private int[][] check_updated_coordinates() {
+    //Client should send data as "coord, coord"
+    private int[] getPlayerMove() {
+        int[] playerMove = null;
+
+        do
+        {
+            try {
+                String str_player_move = reader.readLine();
+
+                // Split the data sent from the client by ','
+                String[] coordNums = str_player_move.split(",");
+
+                playerMove = new int[2];
+                playerMove[0] = Integer.parseInt(coordNums[0]);
+                playerMove[1] = Integer.parseInt(coordNums[1]);
+            }
+            catch (Exception ex) {
+
+            }
+        } while (playerMove == null);
+
+        return playerMove;
+    }
+
+    private int[][] checkUpdatedCoordinates() {
         return new int[][] {};
     }
 
-    private void send_client_updated_moves() {
+    private void sendClientUpdatedMoves() {
 
     }
 
-    private void make_server_move() {
+    private void makeServerMove() {
     }
 
-    private int[][] get_server_updated_coords() {
+    private int[][] getServerUpdatedCoords() {
         return new int[][] {};
     }
 
-    private void send_update_to_client() {
+    private void sendUpdateToClient() {
 
     }
 }
