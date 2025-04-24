@@ -14,6 +14,7 @@ public class UserInterface extends JFrame implements KeyListener {
     private int boardState[][]; // 2d array to hold the board state that will be displayed to the player
     private int cursor[]; // what you are selecting
     private boolean submitted;
+    private boolean yMove;
     private JLabel playerSelection; // displays coordinate selection
     private JLabel board; // place to output the board to
     private JLabel instructions; // tells controls
@@ -35,6 +36,7 @@ public class UserInterface extends JFrame implements KeyListener {
         cursor = new int[] {0,0};
         chk = new Checker();
         submitted = false;
+        yMove = true;
 
         // set up gui
         setTitle("Othello");
@@ -86,7 +88,7 @@ public class UserInterface extends JFrame implements KeyListener {
         serverMessage.setText("Submitting...");
 
         // do not submit if already submitted
-        if (!submitted) {
+        if (!submitted && yMove) {
             // call checker
             if (chk.checkValidity(cursor)) {
                 // send coordinates
