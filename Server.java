@@ -48,6 +48,10 @@ public class Server {
 class ServerThread extends Thread {
     private static final int sleepTimeAfterSendUpdate = 5;
 
+    private static final int[] noValidMove = new int[] {-1, 0};
+    private static final int[] playerLoses = {-1, -1};
+    private static final int[] playerWins = {-1, -2};
+
     private final Color aiColor = Color.AI;
     private OthelloPlayer aiPlayer;
     private BufferedReader reader;
@@ -69,10 +73,10 @@ class ServerThread extends Thread {
             playerCoord = getPlayerMove();
 
             // Check if last move was pass and player move is pass then game is over
-            if (Arrays.equals(lastMove, new int[]{-1, 0}) && Arrays.equals(playerCoord, new int[]{1, 0})) {
+            if (Arrays.equals(lastMove, noValidMove) && Arrays.equals(playerCoord, noValidMove)) {
                 // end game logic
-                Color winner = OthelloPlayer.winner(aiPlayer.getBoard());
-                // Need to meet on if the server sends the winner to the player or if both get it independently
+                endGame();
+                break;
             }
 
             ArrayList<int[]> playerUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), playerCoord, Color.PLAYER);
@@ -90,13 +94,17 @@ class ServerThread extends Thread {
 
             // AI Logic to get the best move and call it on that
             int[]  serverMove = makeServerMove();
+            lastMove = serverMove;
+
+            if (Arrays.equals(serverMove, noValidMove) && Arrays.equals(playerCoord, noValidMove)) {
+                endGame();
+                break;
+            }
 
             ArrayList<int[]> serverUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), serverMove, Color.AI);
 
-
-
-
-        } while (lastMove == null || !(Arrays.equals(lastMove, new int[]{-1, 0}) && Arrays.equals(playerCoord, new int[]{1, 0})));
+            sendServerUpdatedCoords(serverMove, serverUpdatedCoords);
+        } while (true); //keep playing until someone loses or wins
     }
 
     //Client should send data as "coord, coord"
@@ -124,16 +132,48 @@ class ServerThread extends Thread {
     }
 
 
-    private void sendClientUpdatedCoords(ArrayList<int[]> coords) {
+    private void sendClientUpdatedCoords(ArrayList<int[]> coordsChanged) {
+        String coordsToSend = "";
+
+        for (int coordIndex = 0; coordIndex < coordsChanged.size(); coordIndex++) {
+            int[] currentCoordinate = coordsChanged.get(coordIndex);
+
+            // coordsToSend will look like "2,3,1|5,8,0|0,1,2"
+            // You can get the coords using String.split("|") and then individual numbers in the coord with String.split(",")
+            coordsToSend += currentCoordinate[0] + "," + currentCoordinate[1] + "," + currentCoordinate[2] + "|";
+        }
+        coordsToSend = coordsToSend.substring(0, coordsToSend.length() - 1 - 1); //remove final "|"
+
+        boolean successfullySent = true;
+
+        do {
+            try {
+                writer.write(coordsToSend);
+                writer.flush();
+                successfullySent = true;
+            } catch (IOException ex) {
+                successfullySent = false;
+            }
+        } while (!successfullySent);
 
     }
 
+    // AI logic
+    // Return coord to play
     private int[] makeServerMove() {
         return new int[] {};
     }
 
 
-    private void sendServerUpdatedCoords() {
+    private void sendServerUpdatedCoords(int[] serverMove, ArrayList<int[]> coordsChanged) {
+
+    }
+
+    // Needs to send who wins or loses to the client and then end the connection
+    private void endGame() {
+        Color winner = OthelloPlayer.winner(aiPlayer.getBoard());
+        // Need to meet on if the server sends the winner to the player or if both get it independently
+        // Server will send the coord either {-1, -1} or {-1, -2} to signal who wins
 
     }
 }
