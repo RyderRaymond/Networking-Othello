@@ -72,7 +72,7 @@ public class UserInterface extends JFrame implements KeyListener {
      * method to receive a list of coordinates or a message from the server/checker
      */
     public void receiveServerMessage(int[][] msg) {
-        
+
     }
 
     /*
@@ -83,9 +83,11 @@ public class UserInterface extends JFrame implements KeyListener {
         serverMessage.setText("Submitting...");
 
         // call checker
-        chk.checkValidity(cursor);
-
-        // send coordinates
+        if (chk.checkValidity(cursor)) {
+            // send coordinates
+        } else {
+            changeServerMessage("Invalid Move...Try Again");
+        }
     }
 
     /*
