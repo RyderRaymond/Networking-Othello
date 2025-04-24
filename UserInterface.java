@@ -46,7 +46,7 @@ public class UserInterface extends JFrame implements KeyListener {
         instructions = new JLabel("Select with arrow keys. Confirm with Enter. You are \u25cb.");
         playerSelection = new JLabel("Selected: {" + cursor[0] + "," + cursor[1] + "}");
         board = new JLabel("");
-        serverMessage = new JLabel("");
+        serverMessage = new JLabel("Make Your Move...");
 
         // add labels
         add(instructions);
