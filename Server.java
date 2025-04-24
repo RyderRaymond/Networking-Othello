@@ -133,6 +133,28 @@ class ServerThread extends Thread {
 
 
     private void sendClientUpdatedCoords(ArrayList<int[]> coordsChanged) {
+        String coordsToSend = "";
+
+        for (int coordIndex = 0; coordIndex < coordsChanged.size(); coordIndex++) {
+            int[] currentCoordinate = coordsChanged.get(coordIndex);
+
+            // coordsToSend will look like "2,3,1|5,8,0|0,1,2"
+            // You can get the coords using String.split("|") and then individual numbers in the coord with String.split(",")
+            coordsToSend += currentCoordinate[0] + "," + currentCoordinate[1] + "," + currentCoordinate[2] + "|";
+        }
+        coordsToSend = coordsToSend.substring(0, coordsToSend.length() - 1 - 1); //remove final "|"
+
+        boolean successfullySent = true;
+
+        do {
+            try {
+                writer.write(coordsToSend);
+                writer.flush();
+                successfullySent = true;
+            } catch (IOException ex) {
+                successfullySent = false;
+            }
+        } while (!successfullySent);
 
     }
 
