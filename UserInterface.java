@@ -17,6 +17,7 @@ public class UserInterface extends JFrame implements KeyListener {
     private JLabel board; // place to output the board to
     private JLabel instructions; // tells controls
     private JLabel serverMessage; // displays win/loss/waiting
+    private Checker chk; // checker
 
 
     // constructor
@@ -71,7 +72,7 @@ public class UserInterface extends JFrame implements KeyListener {
      * method to receive a list of coordinates or a message from the server/checker
      */
     public void receiveServerMessage(int[][] msg) {
-
+        
     }
 
     /*
@@ -82,6 +83,7 @@ public class UserInterface extends JFrame implements KeyListener {
         serverMessage.setText("Submitting...");
 
         // call checker
+        chk.checkValidity(cursor);
 
         // await server
         serverMessage.setText("Awaiting Server...");
@@ -96,6 +98,7 @@ public class UserInterface extends JFrame implements KeyListener {
             y = uCoords[i][1];
             boardState[x][y] = uCoords[i][3];
         }
+        chk.updateBoard(uCoords);
     }
 
     /*
