@@ -49,9 +49,10 @@ class ServerThread extends Thread {
     private static final int sleepTimeAfterSendUpdate = 5;
 
     private static final int[] noValidMove = new int[] {-1, 0};
-    private static final int[] playerLoses = {-1, -1};
-    private static final int[] playerWins = {-1, -2};
-    private static final int[] tie = {-1, -3};
+    private static final int[] playerLoses = new int[] {-1, -1};
+    private static final int[] playerWins = new int[] {-1, -2};
+    private static final int[] tie = new int[] {-1, -3};
+
 
     private final Color aiColor = Color.AI;
     private OthelloPlayer aiPlayer;
