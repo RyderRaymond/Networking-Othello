@@ -32,6 +32,7 @@ public class UserInterface extends JFrame implements KeyListener {
             {0,0,0,0,0,0,0,0},
             {0,0,0,0,0,0,0,0}};
         cursor = new int[] {0,0};
+        chk = new Checker();
 
         // set up gui
         setTitle("Othello");
