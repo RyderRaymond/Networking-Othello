@@ -85,8 +85,7 @@ public class UserInterface extends JFrame implements KeyListener {
         // call checker
         chk.checkValidity(cursor);
 
-        // await server
-        serverMessage.setText("Awaiting Server...");
+        // send coordinates
     }
 
     /*
@@ -136,6 +135,10 @@ public class UserInterface extends JFrame implements KeyListener {
         // output
         board.setText(tBoardOut);
         playerSelection.setText("Selected: {" + cursor[0] + "," + cursor[1] + "}");
+    }
+
+    public void changeServerMessage(String txt) {
+        serverMessage.setText(txt);
     }
 
     public void keyPressed(KeyEvent e) {
