@@ -77,7 +77,7 @@ public class UserInterface extends JFrame implements KeyListener {
      * method to receive a list of coordinates or a message from the server/checker
      */
     public void receiveServerMessage(int[][] msg) {
-        if (msg[0][0] > 0){
+        if (msg[0][0] >= 0){
             updateBoardState(msg);
         }
     }
