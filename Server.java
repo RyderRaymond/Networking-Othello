@@ -107,6 +107,23 @@ class ServerThread extends Thread {
 
             sendServerUpdatedCoords(serverMove, serverUpdatedCoords);
         } while (true); //keep playing until someone loses or wins
+
+        boolean readerIsClosed = false;
+        boolean writerIsClosed = false;
+
+        do {
+            try {
+                System.out.println("Closing socket for client: " + clientSocket);
+                reader.close();
+                readerIsClosed = true;
+                writer.close();
+                writerIsClosed = true;
+                clientSocket.close();
+            }
+            catch (IOException ex) {
+                System.out.println("Error closing reader, writer, or socket: " + ex.getMessage());
+            }
+        } while (!readerIsClosed && !writerIsClosed && !clientSocket.isClosed());
     }
 
     //Client should send data as "coord, coord"
@@ -135,6 +152,49 @@ class ServerThread extends Thread {
 
 
     private void sendClientUpdatedCoords(ArrayList<int[]> coordsChanged) {
+        String coordsToSend = parseListOfCoordinates(coordsChanged);
+
+        boolean successfullySent = true;
+
+        do {
+            try {
+                writer.write(coordsToSend);
+                writer.newLine();
+                writer.flush();
+                successfullySent = true;
+            } catch (IOException ex) {
+                successfullySent = false;
+            }
+        } while (!successfullySent);
+    }
+
+    // AI logic
+    // Return coord to play
+    private int[] makeServerMove() {
+        return new int[] {};
+    }
+
+
+    private void sendServerUpdatedCoords(int[] serverMove, ArrayList<int[]> coordsChanged) {
+        String serverCoord = "" + serverMove[0] + ',' + serverMove[1];
+        String coordsToSend = parseListOfCoordinates(coordsChanged);
+
+        boolean successfullySent = true;
+        do {
+            try {
+                writer.write(serverCoord);
+                writer.newLine();
+                writer.write(coordsToSend);
+                writer.newLine();
+                writer.flush();
+            }
+            catch (IOException ex) {
+                successfullySent = false;
+            }
+        } while (!successfullySent);
+    }
+
+    private String parseListOfCoordinates(ArrayList<int[]> coordsChanged) {
         String coordsToSend = "";
 
         for (int coordIndex = 0; coordIndex < coordsChanged.size(); coordIndex++) {
@@ -146,29 +206,7 @@ class ServerThread extends Thread {
         }
         coordsToSend = coordsToSend.substring(0, coordsToSend.length() - 1 - 1); //remove final "|"
 
-        boolean successfullySent = true;
-
-        do {
-            try {
-                writer.write(coordsToSend);
-                writer.flush();
-                successfullySent = true;
-            } catch (IOException ex) {
-                successfullySent = false;
-            }
-        } while (!successfullySent);
-
-    }
-
-    // AI logic
-    // Return coord to play
-    private int[] makeServerMove() {
-        return new int[] {};
-    }
-
-
-    private void sendServerUpdatedCoords(int[] serverMove, ArrayList<int[]> coordsChanged) {
-
+        return coordsToSend;
     }
 
     // Needs to send who wins or loses to the client and then end the connection
