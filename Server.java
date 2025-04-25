@@ -20,6 +20,7 @@ public class Server {
             }
         } while (port < 0);
 
+        System.out.println("Listening for new connections");
         try (ServerSocket serverSock = new ServerSocket(port)) {
             while (true) {
                 Socket newClient = serverSock.accept();
