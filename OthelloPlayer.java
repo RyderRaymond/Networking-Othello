@@ -184,7 +184,31 @@ public class OthelloPlayer {
   }
 
   public static Color winner(Color[][] board) { // Checks if there is a winner
-    return Color.EMPTY; // Placeholder for actual winner check logic
+    int totalPlayer = 0;
+    int totalAI = 0;
+    for (int i = 0; i < board.length; i++){
+        for (int j = 0; j < board[i].length; j++){
+            Color current = board[i][j];
+            if (current == Color.EMPTY){
+                continue;
+                }
+            else if (current == Color.PLAYER){
+                totalPlayer++;
+                }
+            else if (current == Color.AI){
+                totalAI++;
+                }
+            }
+        }
+        if (totalPlayer > totalAI){
+            return Color.PLAYER; //Player wins
+            }
+        else if(totalAI > totalPlayer){
+            return Color.AI; //AI wins
+            }
+        else{
+            return Color.EMPTY; //tie between both players
+            }
   }
 
 
