@@ -168,13 +168,6 @@ class ServerThread extends Thread {
         } while (!successfullySent);
     }
 
-    // AI logic
-    // Return coord to play
-    private int[] makeServerMove() {
-        return new int[] {};
-    }
-
-
     private void sendServerUpdatedCoords(int[] serverMove, ArrayList<int[]> coordsChanged) {
         String serverCoord = "" + serverMove[0] + ',' + serverMove[1];
         String coordsToSend = parseListOfCoordinates(coordsChanged);
@@ -204,9 +197,38 @@ class ServerThread extends Thread {
             // You can get the coords using String.split("|") and then individual numbers in the coord with String.split(",")
             coordsToSend += currentCoordinate[0] + "," + currentCoordinate[1] + "," + currentCoordinate[2] + "|";
         }
-        coordsToSend = coordsToSend.substring(0, coordsToSend.length() - 1 - 1); //remove final "|"
+        coordsToSend = coordsToSend.substring(0, coordsToSend.length() - 1); //remove final "|"
 
         return coordsToSend;
+    }
+
+    // AI logic
+    // Return coord to play
+    private int[] makeServerMove() {
+      ArrayList<int[]> moves = OthelloPlayer.getMoves(aiPlayer.getBoard(), aiColor);
+      if (moves.get(0)[0] == -1) return new int[]{-1, 0}; // No valid moves available
+      int bestMove = -1;
+      int bestWeight = 0;
+      int[] weights = new int[moves.size()];
+      for (int i = 0; i < moves.size(); i++) {
+          int[] move = moves.get(i);
+          ArrayList<int[]> updatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), move, aiColor);
+          Color[][] nextBoard = OthelloPlayer.updateBoard(aiPlayer.getBoard(), updatedCoords);
+
+          int weight = OthelloPlayer.count(nextBoard, aiColor);
+          if (OthelloPlayer.isCorner(move)) weight += 10;
+          if (OthelloPlayer.isEdge(move)) weight += 5;
+          if (OthelloPlayer.isNextToCorner(move)) weight -= 15;
+
+          weight -= OthelloPlayer.bestOutcome(nextBoard, Color.PLAYER);
+
+          weights[i] = weight;
+          if (weight > bestWeight) {
+              bestWeight = weight;
+              bestMove = i;
+          }
+      }
+      return moves.get(bestMove);
     }
 
     // Needs to send who wins or loses to the client and then end the connection

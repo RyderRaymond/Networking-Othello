@@ -10,7 +10,7 @@ public class Checker { // clientside class that checks the player's moves
 
   Checker(Color playerColor, Color[][] board) {
     this.playerColor = playerColor;
-    this.board = board;
+    this.board = board; //comment
   }
 
   public boolean checkValidity(int[] coord) {
