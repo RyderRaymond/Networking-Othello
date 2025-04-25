@@ -85,7 +85,7 @@ class ServerThread extends Thread {
             aiPlayer.updateBoard(playerUpdatedCoords);
 
             // Send playerUpdatedCoords to player
-            sendClientUpdatedCoords(playerUpdatedCoords);
+            sendClientUpdatedCoords(playerCoord, playerUpdatedCoords);
 
             try {
                 Thread.sleep(sleepTimeAfterSendUpdate);
@@ -127,15 +127,17 @@ class ServerThread extends Thread {
     }
 
     //Client should send data as "coord, coord"
+    //Example: "2,5"
     private int[] getPlayerMove() {
         int[] playerMove = null;
 
-        do
+        do //keep trying to read in case we get an IO error and the move isn't correctly received
         {
             try {
                 String str_player_move = reader.readLine();
 
                 // Split the data sent from the client by ','
+                // So if the reader reads "4,6" it parses to an array index 0 = 4, index 1 = 6
                 String[] coordNums = str_player_move.split(",");
 
                 playerMove = new int[2];
@@ -150,14 +152,25 @@ class ServerThread extends Thread {
         return playerMove;
     }
 
+    // Sends the coordinates that the client's move updated
+    // See parseListOfCoordinates to see what the string looks like
 
-    private void sendClientUpdatedCoords(ArrayList<int[]> coordsChanged) {
+    // Basically, every time the client tries to read from the server the coordinates the Player's last move updated,
+    // and whenver the client is trying to read the server's updated coordinates, it needs to read a single coordinate as one line,
+    // and then determine if that is a valid coordinate or if it is a notification that someone has won.
+    // If someone won, display who won
+    // If no one won and this is a real coordinate, display the coordinates changed
+    private void sendClientUpdatedCoords(int[] playerMoveAgain, ArrayList<int[]> coordsChanged) {
+        String playerLastMove = "" + playerMoveAgain[0] + "," + playerMoveAgain[1];
+
         String coordsToSend = parseListOfCoordinates(coordsChanged);
 
         boolean successfullySent = true;
 
         do {
             try {
+                writer.write(playerLastMove);
+                writer.newLine();
                 writer.write(coordsToSend);
                 writer.newLine();
                 writer.flush();
@@ -168,6 +181,7 @@ class ServerThread extends Thread {
         } while (!successfullySent);
     }
 
+    // When the client reads the server's updated coordinates,
     private void sendServerUpdatedCoords(int[] serverMove, ArrayList<int[]> coordsChanged) {
         String serverCoord = "" + serverMove[0] + ',' + serverMove[1];
         String coordsToSend = parseListOfCoordinates(coordsChanged);
@@ -187,6 +201,8 @@ class ServerThread extends Thread {
         } while (!successfullySent);
     }
 
+    // Takes in the ArrayList of changed coordinates on the board and creates a string that will be sent to the client
+    // The string will look like "2,3,1|5,8,0|" for coordinate (2, 3) being changed to Color.AI and (5, 8) being set to Empty
     private String parseListOfCoordinates(ArrayList<int[]> coordsChanged) {
         String coordsToSend = "";
 
@@ -234,8 +250,29 @@ class ServerThread extends Thread {
     // Needs to send who wins or loses to the client and then end the connection
     private void endGame() {
         Color winner = OthelloPlayer.winner(aiPlayer.getBoard());
-        // Need to meet on if the server sends the winner to the player or if both get it independently
-        // Server will send the coord either {-1, -1} or {-1, -2} to signal who wins
 
+        int[] winnerCoord = null;
+        winnerCoord = switch (winner) {
+            case Color.AI -> playerLoses;
+            case Color.PLAYER -> playerWins;
+            case Color.EMPTY -> tie;
+        };
+
+        //Send the coordinate as "-1,0" for example
+        String stringToWrite = "" + winnerCoord[0] + "," + winnerCoord[1];
+
+        boolean sentWinner = false;
+
+        do {
+            try {
+                writer.write(stringToWrite);
+                writer.newLine();
+                writer.flush();
+                sentWinner = true;
+            }
+            catch (IOException ex) {
+                sentWinner = false;
+            }
+        } while (!sentWinner);
     }
 }
