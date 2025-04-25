@@ -229,8 +229,7 @@ class ServerThread extends Thread {
       int[] weights = new int[moves.size()];
       for (int i = 0; i < moves.size(); i++) {
           int[] move = moves.get(i);
-          ArrayList<int[]> updatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), move, aiColor);
-          Color[][] nextBoard = OthelloPlayer.updateBoard(aiPlayer.getBoard(), updatedCoords);
+          Color[][] nextBoard = OthelloPlayer.placeOnBoard(aiPlayer.getBoard(), move, aiColor);
 
           int weight = OthelloPlayer.count(nextBoard, aiColor);
           if (OthelloPlayer.isCorner(move)) weight += 10;

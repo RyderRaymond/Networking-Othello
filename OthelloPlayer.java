@@ -114,6 +114,38 @@ public class OthelloPlayer {
     // must call updateBoard(changes) to update the board
   }
 
+  public static Color[][] placeOnBoard(Color[][] board, int[] coord, Color color) { // returns a new board after the move
+
+    int[] placedTile = coord;
+    Color[][] newBoard = board;
+    newBoard[placedTile[0]][placedTile[1]] = color;
+
+    // Check all 8 directions for pieces to flip
+    for (int x = -1; x <= 1; x++) {
+      for (int y = -1; y <= 1; y++) {
+        if (x == 0 && y == 0) continue; // Skip the current tile
+        int i = placedTile[0] + x;
+        int j = placedTile[1] + y;
+        while (i >= 0 && i < 8 && j >= 0 && j < 8) {
+          if (board[i][j] == EMPTY) break; // No pieces to flip
+          if (board[i][j] == color) {
+            // Flip the pieces in the direction of the move
+            for (int k = 1; k <= Math.abs(i - placedTile[0]); k++) { // here, i-placedTile[0] is the number of pieces to flip
+              newBoard[placedTile[0] + k * x][placedTile[1] + k * y] = color;
+            }
+            break;
+          }
+          i += x;
+          j += y;
+        }
+      }
+    }
+
+    return newBoard;
+    // return a list of coordinates of the pieces changed {x, y, color}
+    // must call updateBoard(changes) to update the board
+  }
+
   public void updateBoard(ArrayList<int[]> changes) { // given the array of changed tiles, update the board
     for (int[] change: changes){
       int x = change[0];
