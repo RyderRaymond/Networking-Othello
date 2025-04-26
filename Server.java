@@ -150,6 +150,7 @@ class ServerThread extends Thread {
             }
         } while (playerMove == null);
 
+        System.out.println("Received coordinate from client" + clientSocket + ": (" + playerMove[0] + "," + playerMove[1] + ")" );
         return playerMove;
     }
 
