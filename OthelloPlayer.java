@@ -78,10 +78,7 @@ public class OthelloPlayer {
   public static ArrayList<int[]> place(Color[][] board, int[] coord, Color color) { // returns the array of changed tiles
     ArrayList<int[]> changes = new ArrayList<>();
     int[] placedTile = coord;
-    int[] change = new int[3];
-    change[0] = placedTile[0];
-    change[1] = placedTile[1];
-    change[2] = color.ordinal();
+    int[] change = {placedTile[0], placedTile[1], color.ordinal()};
     changes.add(change);
 
     // Check all 8 directions for pieces to flip
@@ -91,11 +88,12 @@ public class OthelloPlayer {
         int i = placedTile[0] + x;
         int j = placedTile[1] + y;
         int[] flip = new int[3];
+        int distance = 1;
         while (i >= 0 && i < 8 && j >= 0 && j < 8) {
           if (board[i][j] == EMPTY) break; // No pieces to flip
           if (board[i][j] == color) {
             // Flip the pieces in the direction of the move
-            for (int k = 1; k <= Math.abs(i - placedTile[0]); k++) { // here, i-placedTile[0] is the number of pieces to flip
+            for (int k = 1; k < distance; k++) { // here, i-placedTile[0] is the number of pieces to flip
               flip[0] = placedTile[0] + k * x;
               flip[1] = placedTile[1] + k * y;
               flip[2] = color.ordinal();
@@ -105,6 +103,7 @@ public class OthelloPlayer {
           }
           i += x;
           j += y;
+          distance++;
         }
       }
     }
@@ -126,17 +125,19 @@ public class OthelloPlayer {
         if (x == 0 && y == 0) continue; // Skip the current tile
         int i = placedTile[0] + x;
         int j = placedTile[1] + y;
+        int distance = 1;
         while (i >= 0 && i < 8 && j >= 0 && j < 8) {
           if (board[i][j] == EMPTY) break; // No pieces to flip
           if (board[i][j] == color) {
             // Flip the pieces in the direction of the move
-            for (int k = 1; k <= Math.abs(i - placedTile[0]); k++) { // here, i-placedTile[0] is the number of pieces to flip
+            for (int k = 1; k < distance; k++) { // here, i-placedTile[0] is the number of pieces to flip
               newBoard[placedTile[0] + k * x][placedTile[1] + k * y] = color;
             }
             break;
           }
           i += x;
           j += y;
+          distance++;
         }
       }
     }
@@ -174,8 +175,8 @@ public class OthelloPlayer {
         int j = placedTile[1] + y;
         // Check if the move is within bounds and if there are opponent pieces in the direction of the move
         while (i >= 0 && i < 8 && j >= 0 && j < 8 && aBoard[i][j] == opponentColor) {
-          if (aBoard[i][j] == EMPTY) break; // No pieces to flip
-          if (aBoard[i][j] == aColor) return true; // Valid move
+          if (i+x < 0 || i+x >= 8 || j+y < 0 || j+y >= 8) break; // Out of bounds
+          if (aBoard[i+x][j+y] == aColor) return true; // Valid move
           i += x;
           j += y;
         }
@@ -213,7 +214,7 @@ public class OthelloPlayer {
     return false;
   }
 
-  public static Color winner(Color[][] board) { // Checks if there is a winner
+  public static Color winner(Color[][] board) { // Checks who the winner is
     int totalPlayer = 0;
     int totalAI = 0;
     for (int i = 0; i < board.length; i++){
@@ -241,5 +242,61 @@ public class OthelloPlayer {
             }
   }
 
+  // Helper method to print the board
+  public static void printBoard(Color[][] board) {
+    for (int i = 0; i < board.length; i++) {
+      for (int j = 0; j < board[i].length; j++) {
+        if (board[i][j] == Color.EMPTY) {
+          System.out.print(".\t");
+        } else if (board[i][j] == Color.PLAYER) {
+          System.out.print("P\t");
+        } else if (board[i][j] == Color.AI) {
+          System.out.print("A\t");
+        }
+      }
+      System.out.println();
+    }
+  }
+
+  public static void main(String[] args) {
+    // Initialize the board
+    Color[][] board = new Color[][] {
+        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY},
+        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY},
+        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY},
+        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.PLAYER, Color.AI, Color.EMPTY, Color.EMPTY, Color.EMPTY},
+        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.AI, Color.PLAYER, Color.EMPTY, Color.EMPTY, Color.EMPTY},
+        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY},
+        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY},
+        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY}
+    };
+
+    // Print the initial board
+    System.out.println("Initial Board:");
+    printBoard(board);
+
+    for (int i = 0; i < 8; i++) {
+      for (int j = 0; j < 8; j++) {
+        boolean isValid = OthelloPlayer.isValidMove(board, new int[]{i, j}, Color.PLAYER);
+        if (isValid) {
+          System.out.print("X\t"); // Valid move
+        } else {
+          System.out.print(".\t"); // Invalid move
+        }
+      }
+      System.out.println();
+    }
+
+    // Make a move
+    int[] move = {2, 3}; // Example move
+    ArrayList<int[]> changes = OthelloPlayer.place(board, move, Color.PLAYER); // Get changed tiles
+    Color[][] updatedBoard1 = OthelloPlayer.updateBoard(board, changes); // Update the board
+    //Color[][] updatedBoard2 = OthelloPlayer.placeOnBoard(board, move, Color.AI);
+
+    // Print the updated board
+    System.out.println("\nUpdated Board:");
+    printBoard(updatedBoard1);
+    //printBoard(updatedBoard2);
+  }
 
 }
