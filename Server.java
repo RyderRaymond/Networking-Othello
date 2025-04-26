@@ -146,7 +146,7 @@ class ServerThread extends Thread {
                 playerMove[1] = Integer.parseInt(coordNums[1]);
             }
             catch (Exception ex) {
-
+                System.out.println("Problem receiving coordinate from client: " + ex.getMessage());
             }
         } while (playerMove == null);
 
