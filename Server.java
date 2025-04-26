@@ -232,7 +232,7 @@ class ServerThread extends Thread {
           Color[][] nextBoard = OthelloPlayer.placeOnBoard(aiPlayer.getBoard(), move, aiColor);
 
           int weight = OthelloPlayer.count(nextBoard, aiColor);
-          if (OthelloPlayer.isCorner(move)) weight += 10;
+          if (OthelloPlayer.isCorner(move)) weight += 20;
           if (OthelloPlayer.isEdge(move)) weight += 5;
           if (OthelloPlayer.isNextToCorner(move)) weight -= 15;
 
