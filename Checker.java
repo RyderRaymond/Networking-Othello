@@ -37,7 +37,6 @@ public class Checker { // clientside class that checks the player's moves
         // Check if the move is within bounds and if there are opponent pieces in the direction of the move
         while (i >= 0 && i < 8 && j >= 0 && j < 8 && board[i][j] == opponentColor) {
           if (i+x < 0 || i+x >= 8 || j+y < 0 || j+y >= 8) break; // Out of bounds
-          if (board[i+x][j+y] == EMPTY) break; // No pieces to flip
           if (board[i+x][j+y] == playerColor) return true; // Valid move
           i += x;
           j += y;
