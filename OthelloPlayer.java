@@ -46,7 +46,8 @@ public class OthelloPlayer {
         if (board[i][j] == EMPTY) { // Check if the tile is empty
           int[] coord = {i, j};
           if (isValidMove(board, coord, color)) { // Check if the move is valid
-            validMoves.add(coord);
+            int[] move = {j, i}; // Store the move in (x, y) format
+            validMoves.add(move); // Add the move to the list
           }
         }
       }
@@ -77,8 +78,10 @@ public class OthelloPlayer {
 
   public static ArrayList<int[]> place(Color[][] board, int[] coord, Color color) { // returns the array of changed tiles
     ArrayList<int[]> changes = new ArrayList<>();
-    int[] placedTile = coord;
-    int[] change = {placedTile[1], placedTile[0], color.ordinal()};
+    int[] placedTile = new int[2];
+    placedTile[0] = coord[1];
+    placedTile[1] = coord[0];
+    int[] change = {placedTile[0], placedTile[1], color.ordinal()};
     changes.add(change);
 
     // Check all 8 directions for pieces to flip
@@ -87,13 +90,13 @@ public class OthelloPlayer {
         if (x == 0 && y == 0) continue; // Skip the current tile
         int i = placedTile[0] + x;
         int j = placedTile[1] + y;
-        int[] flip = new int[3];
         int distance = 1;
         while (i >= 0 && i < 8 && j >= 0 && j < 8) {
           if (board[i][j] == EMPTY) break; // No pieces to flip
           if (board[i][j] == color) {
             // Flip the pieces in the direction of the move
             for (int k = 1; k < distance; k++) { // here, i-placedTile[0] is the number of pieces to flip
+              int[] flip = new int[3];
               flip[0] = placedTile[0] + k * x;
               flip[1] = placedTile[1] + k * y;
               flip[2] = color.ordinal();
@@ -107,7 +110,10 @@ public class OthelloPlayer {
         }
       }
     }
-
+    System.out.println("Changes: ");
+    for (int[] change1 : changes) {
+      System.out.println("x: " + change1[0] + ", y: " + change1[1] + ", color: " + Color.values()[change1[2]]);
+    }
     return changes;
     // return a list of coordinates of the pieces changed {x, y, color}
     // must call updateBoard(changes) to update the board
@@ -115,9 +121,11 @@ public class OthelloPlayer {
 
   public static Color[][] placeOnBoard(Color[][] board, int[] coord, Color color) { // returns a new board after the move
 
-    int[] placedTile = coord;
+    int[] placedTile = new int[2];
+    placedTile[0] = coord[1];
+    placedTile[1] = coord[0];
     Color[][] newBoard = board;
-    newBoard[placedTile[1]][placedTile[0]] = color;
+    newBoard[placedTile[0]][placedTile[1]] = color;
 
     // Check all 8 directions for pieces to flip
     for (int x = -1; x <= 1; x++) {
@@ -262,8 +270,8 @@ public class OthelloPlayer {
     // Initialize the board
     Color[][] board = new Color[][] {
         {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY},
-        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY},
-        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY},
+        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.PLAYER, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY},
+        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.PLAYER, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY},
         {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.PLAYER, Color.AI, Color.EMPTY, Color.EMPTY, Color.EMPTY},
         {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.AI, Color.PLAYER, Color.EMPTY, Color.EMPTY, Color.EMPTY},
         {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY},
@@ -281,7 +289,7 @@ public class OthelloPlayer {
     }
     System.out.println();
 
-    for (int i = 0; i < 8; i++) {
+    /*for (int i = 0; i < 8; i++) {
       for (int j = 0; j < 8; j++) {
         boolean isValid = OthelloPlayer.isValidMove(board, new int[]{i, j}, Color.PLAYER);
         if (isValid) {
@@ -292,17 +300,16 @@ public class OthelloPlayer {
       }
       System.out.println();
     }
-
+    */
     // Make a move
-    int[] move = {3, 2}; // Example move
-    //ArrayList<int[]> changes = OthelloPlayer.place(board, move, Color.AI); // Get changed tiles
-    //Color[][] updatedBoard1 = OthelloPlayer.updateBoard(board, changes); // Update the board using changes
-    Color[][] updatedBoard2 = OthelloPlayer.placeOnBoard(board, move, Color.AI); // Update the board using the move
+    int[] move = {3, 0}; // Example move
+    ArrayList<int[]> changes = OthelloPlayer.place(board, move, Color.AI); // Get changed tiles
+    Color[][] updatedBoard = OthelloPlayer.updateBoard(board, changes); // Update the board using changes
+    //Color[][] updatedBoard = OthelloPlayer.placeOnBoard(board, move, Color.AI); // Update the board using the move
 
     // Print the updated board
-    System.out.println("\nUpdated Board:");
-    //printBoard(updatedBoard1);
-    printBoard(updatedBoard2);
+    //System.out.println("\nUpdated Board:");
+    printBoard(updatedBoard);
   }
 
 }
