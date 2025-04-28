@@ -240,7 +240,7 @@ class ServerThread extends Thread {
           Color[][] nextBoard = OthelloPlayer.placeOnBoard(OthelloPlayer.deepCopyBoard(aiPlayer.getBoard()), move, aiColor);
 
           int weight = OthelloPlayer.count(nextBoard, aiColor);
-          if (OthelloPlayer.isCorner(move)) weight += 20;
+          if (OthelloPlayer.isCorner(move)) weight += 30;
           if (OthelloPlayer.isEdge(move)) weight += 5;
           if (OthelloPlayer.isNextToCorner(move)) weight -= 15;
           //System.out.println("before bestOutcome: ");
