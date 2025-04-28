@@ -227,7 +227,7 @@ class ServerThread extends Thread {
     private int[] makeServerMove() {
       ArrayList<int[]> moves = OthelloPlayer.getMoves(aiPlayer.getBoard(), aiColor);
       if (moves.get(0)[0] == -1) return new int[]{-1, 0}; // No valid moves available
-      int bestMove = -1;
+      int bestMove = 0;
       int bestWeight = 0;
       int[] weights = new int[moves.size()];
       for (int i = 0; i < moves.size(); i++) {
