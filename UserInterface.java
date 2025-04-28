@@ -113,6 +113,7 @@ public class UserInterface extends JFrame implements KeyListener {
             boardState[x][y] = uCoords[i][2];
         }
         chk.updateBoard(uCoords);
+        renderBoard();
     }
 
     /*
