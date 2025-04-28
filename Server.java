@@ -86,7 +86,10 @@ class ServerThread extends Thread {
                 }
 
                 ArrayList<int[]> playerUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), playerCoord, Color.PLAYER);
-                aiPlayer.updateBoard(playerUpdatedCoords);
+
+                if (playerUpdatedCoords.get(0)[0] != -1) {
+                    aiPlayer.updateBoard(playerUpdatedCoords);
+                }
                 OthelloPlayer.printBoard(aiPlayer.getBoard());
 
                 // Send playerUpdatedCoords to player
@@ -94,27 +97,31 @@ class ServerThread extends Thread {
 
                 try {
                     Thread.sleep(sleepTimeAfterSendUpdate);
-                }
-                catch (InterruptedException ex) {
+                } catch (InterruptedException ex) {
                     System.out.println("Problem sleeping to let the user look at what coordinates are updated: " + ex.getMessage() + ".\nContinuing execution.");
                 }
 
                 // AI Logic to get the best move and call it on that
-                int[]  serverMove = makeServerMove();
+                int[] serverMove = makeServerMove();
+                System.out.println("Server move: " + serverMove[0] + "," + serverMove[1]);
                 lastMove = serverMove;
 
                 if (Arrays.equals(serverMove, noValidMove) && Arrays.equals(playerCoord, noValidMove)) {
                     endGame();
                     break;
                 }
-                System.out.println("Server move: " + serverMove[0] + "," + serverMove[1]);
-                //OthelloPlayer.printBoard(aiPlayer.getBoard());
-                ArrayList<int[]> serverUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), serverMove, Color.AI);
-                //OthelloPlayer.printChanges(serverUpdatedCoords);
-                aiPlayer.updateBoard(serverUpdatedCoords);
-                //OthelloPlayer.printBoard(aiPlayer.getBoard());
-
-                sendServerUpdatedCoords(serverMove, serverUpdatedCoords);
+                else if (!Arrays.equals(serverMove, noValidMove))
+                {
+                    //OthelloPlayer.printBoard(aiPlayer.getBoard());
+                    ArrayList<int[]> serverUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), serverMove, Color.AI);
+                    //OthelloPlayer.printChanges(serverUpdatedCoords);
+                    aiPlayer.updateBoard(serverUpdatedCoords);
+                    //OthelloPlayer.printBoard(aiPlayer.getBoard());
+                    sendServerUpdatedCoords(serverMove, serverUpdatedCoords);
+                }
+                else {
+                    sendServerUpdatedCoords(serverMove, null);
+                }
             } while (true); //keep playing until someone loses or wins
         }
         catch (Exception ex)
@@ -201,15 +208,24 @@ class ServerThread extends Thread {
     // When the client reads the server's updated coordinates,
     private void sendServerUpdatedCoords(int[] serverMove, ArrayList<int[]> coordsChanged) {
         String serverCoord = "" + serverMove[0] + ',' + serverMove[1];
-        String coordsToSend = parseListOfCoordinates(coordsChanged);
+        String coordsToSend = "";
+        if (coordsChanged == null) {
+            coordsToSend = null;
+        }
+        else {
+            coordsToSend = parseListOfCoordinates(coordsChanged);
+        }
 
         boolean successfullySent = true;
 //        do {
             try {
                 writer.write(serverCoord);
                 writer.newLine();
-                writer.write(coordsToSend);
-                writer.newLine();
+                if ( !(coordsToSend == null) ){
+                    writer.write(coordsToSend);
+                    writer.newLine();
+                }
+
                 writer.flush();
             }
             catch (IOException ex) {

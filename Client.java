@@ -55,11 +55,16 @@ public class Client {
 
     public void play() {
         try {
+            int[] lastMove = null;
+
             while (true) {
 
-                int[] lastMove = null;
-
                 Color color = Color.PLAYER; // Define the color variable
+                ArrayList<int[]> moves = OthelloPlayer.getMoves(othelloPlayer.getBoard(), color);
+                System.out.println("Valid Moves");
+                for (int[] move : moves) {
+                    System.out.println(move[0] + ", " + move[1]);
+                }
                 if (OthelloPlayer.getMoves(othelloPlayer.getBoard(), color).get(0)[0] == -1) {
                     ui.changeServerMessage("No valid moves available. Waiting for opponent...");
                     sendPlayerMove(new int[]{-1, -1});
