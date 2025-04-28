@@ -132,14 +132,16 @@ class ServerThread extends Thread {
     private int[] getPlayerMove() {
         int[] playerMove = null;
 
-        do //keep trying to read in case we get an IO error and the move isn't correctly received
-        {
+//        do //keep trying to read in case we get an IO error and the move isn't correctly received
+//        {
             try {
                 String str_player_move = reader.readLine();
+                System.out.println("String: " + str_player_move);
 
                 // Split the data sent from the client by ','
                 // So if the reader reads "4,6" it parses to an array index 0 = 4, index 1 = 6
                 String[] coordNums = str_player_move.split(",");
+                System.out.println("CoordNums: " + coordNums.toString());
 
                 playerMove = new int[2];
                 playerMove[0] = Integer.parseInt(coordNums[0]);
@@ -148,9 +150,9 @@ class ServerThread extends Thread {
             catch (Exception ex) {
                 System.out.println("Problem receiving coordinate from client: " + ex.getMessage());
             }
-        } while (playerMove == null);
+//        } while (playerMove == null);
 
-        System.out.println("Received coordinate from client" + clientSocket + ": (" + playerMove[0] + "," + playerMove[1] + ")" );
+        System.out.println("Received coordinate from client: (" + playerMove[0] + "," + playerMove[1] + ")" );
         return playerMove;
     }
 
@@ -169,7 +171,7 @@ class ServerThread extends Thread {
 
         boolean successfullySent = true;
 
-        do {
+//        do {
             try {
                 writer.write(playerLastMove);
                 writer.newLine();
@@ -180,7 +182,7 @@ class ServerThread extends Thread {
             } catch (IOException ex) {
                 successfullySent = false;
             }
-        } while (!successfullySent);
+//        } while (!successfullySent);
     }
 
     // When the client reads the server's updated coordinates,
@@ -189,7 +191,7 @@ class ServerThread extends Thread {
         String coordsToSend = parseListOfCoordinates(coordsChanged);
 
         boolean successfullySent = true;
-        do {
+//        do {
             try {
                 writer.write(serverCoord);
                 writer.newLine();
@@ -200,7 +202,7 @@ class ServerThread extends Thread {
             catch (IOException ex) {
                 successfullySent = false;
             }
-        } while (!successfullySent);
+//        } while (!successfullySent);
     }
 
     // Takes in the ArrayList of changed coordinates on the board and creates a string that will be sent to the client
@@ -264,7 +266,7 @@ class ServerThread extends Thread {
 
         boolean sentWinner = false;
 
-        do {
+//        do {
             try {
                 writer.write(stringToWrite);
                 writer.newLine();
@@ -274,6 +276,6 @@ class ServerThread extends Thread {
             catch (IOException ex) {
                 sentWinner = false;
             }
-        } while (!sentWinner);
+//        } while (!sentWinner);
     }
 }
