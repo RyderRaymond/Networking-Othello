@@ -1,9 +1,22 @@
 import java.io.*;
 import java.net.*;
-import java.util.Scanner;
 import java.util.ArrayList;
 
 public class Client {
+    private Socket socket;
+    private BufferedWriter writer;
+    private BufferedReader reader;
+    private OthelloPlayer othelloPlayer;
+    private UserInterface ui;
+
+    public Client(Socket socket, BufferedWriter writer, BufferedReader reader)
+    {
+        this.socket = socket;
+        this.writer = writer;
+        this.reader = reader;
+        othelloPlayer = new OthelloPlayer(Color.PLAYER);
+        ui = new UserInterface(this);
+    }
 
     public static void main(String[] args) {
         try {
@@ -14,12 +27,8 @@ public class Client {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            ClientPlayer player =new ClientPlayer(socket, writer, reader);
+            Client player =new Client(socket, writer, reader);
             player.play();
-
-
-            reader.readLine();
-
 
         }
         catch (IOException ex) {
@@ -27,57 +36,49 @@ public class Client {
         }
     }
 
-
-
-}
-
-class ClientPlayer {
-    private Socket socket;
-    private BufferedWriter writer;
-    private BufferedReader reader;
-    private OthelloPlayer othelloPlayer;
-    private UserInterface ui;
-
-    public ClientPlayer(Socket socket, BufferedWriter writer, BufferedReader reader)
-    {
-        this.socket = socket;
-        this.writer = writer;
-        this.reader = reader;
-        othelloPlayer = new OthelloPlayer(Color.PLAYER);
-        ui = new UserInterface(this);
-    }
-
     public void play() {
         try {
-            int[] lastMove = null;
+            while (true) {
 
-            sendPlayerMove(new int[]{3, 5});
-            int[][] clientUpdatedCoords = receiveClientUpdatedCoords();
-            ui.receiveServerMessage(clientUpdatedCoords);
+                int[] lastMove = null;
 
-            int[] serverMove = receiveServerMove();
+                ArrayList<int[]> clientUpdatedCoords = receiveClientUpdatedCoords();
+                ui.receiveServerMessage((int[][]) clientUpdatedCoords.toArray());
 
-            ArrayList<int[]> serverUpdatedCoords = receiveServerUpdatedcoords();
+                int[] serverMove = receiveServerMove();
+
+                ArrayList<int[]> serverUpdatedCoords = receiveServerUpdatedcoords();
 
 //            othelloPlayer.updateBoard(serverUpdatedCoords);
 //            ui.receiveServerMessage((int[][]) serverUpdatedCoords.toArray());
 
 
+                //While the game is running
+                //Update board
+                //Have user input move
+                //Send move to server
+                //if valid, accept, wait 5 seconds, and send server's move
 
-            //While the game is running
-            //Update board
-            //Have user input move
-            //Send move to server
-            //if valid, accept, wait 5 seconds, and send server's move
-
-            //if no more valid moves on either side
-            //procedure to end game
-            //print to client who won
-            //close connection
+                //if no more valid moves on either side
+                //procedure to end game
+                //print to client who won
+                //close connection
+            }
         }
         catch (IOException ex)
         {
             System.out.println("An error occurred during the connection: " + ex.getMessage());
+        }
+        finally {
+            try {
+                socket.close();
+                writer.close();
+                reader.close();
+            }
+            catch (IOException ex)
+            {
+                System.out.println("Error closing sockets: " + ex.getMessage());
+            }
         }
     }
 
@@ -92,7 +93,7 @@ class ClientPlayer {
         } catch (Exception e) {}
     }
 
-    private int[][] receiveClientUpdatedCoords() throws IOException
+    private ArrayList<int[]> receiveClientUpdatedCoords() throws IOException
     {
         String lastMove = reader.readLine();
         System.out.println("Read last move: " + lastMove);
@@ -112,28 +113,14 @@ class ClientPlayer {
             int[] coord = new int[]{
                 Integer.parseInt(nums[0]),
             Integer.parseInt(nums[1]),
-            Integer.parseInt(nums[2]),
-};
+            Integer.parseInt(nums[2]) };
             coordinateList.add(coord);
         }
         for (int[] item : coordinateList) {
             System.out.println(item[0] + " " + item[1] + " " + item[2]);
         }
 
-        System.out.println(coordinateList.size());
-        int[][] result = new int[coordinateList.size()][coordinateList.get(0).length];
-
-        for (int i = 0; i < coordinateList.size(); i++) {
-            System.out.println(i);
-            System.out.println(coordinateList.get(i).length);
-            result[i] = coordinateList.get(i);
-        }
-
-        othelloPlayer.updateBoard(coordinateList);
-
-        OthelloPlayer.printBoard(othelloPlayer.getBoard());
-
-        return result;
+        return coordinateList;
     }
 
     private int[] receiveServerMove() throws IOException
