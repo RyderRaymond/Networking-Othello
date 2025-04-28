@@ -13,8 +13,8 @@ import javax.swing.JLabel;
 public class UserInterface extends JFrame implements KeyListener {
     private int boardState[][]; // 2d array to hold the board state that will be displayed to the player
     private int cursor[]; // what you are selecting
-    private boolean submitted;
-    private boolean yMove;
+    private boolean submitted; // blocker for submitting
+    private boolean yMove; //blocker for turn
     private JLabel playerSelection; // displays coordinate selection
     private JLabel board; // place to output the board to
     private JLabel instructions; // tells controls
@@ -43,28 +43,28 @@ public class UserInterface extends JFrame implements KeyListener {
 
         // set up gui
         setTitle("Othello");
-        setSize(1600, 900);
+        setSize(450, 350);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         // prepare labels and frame
-        instructions = new JLabel("Select with arrow keys. Confirm with Enter. You are \u25cb.");
+        instructions = new JLabel("Select with arrow keys. Confirm with Enter. You are \u25cb. ESC to exit.");
         playerSelection = new JLabel("Selected: {" + cursor[0] + "," + cursor[1] + "}");
         board = new JLabel("");
         serverMessage = new JLabel("Make Your Move...");
 
         // add labels
         add(instructions);
-        instructions.setBounds(20, 20, 1400, 15);
+        instructions.setBounds(20, 20, 400, 15);
 
         add(playerSelection);
-        playerSelection.setBounds(20, 50, 1400, 15);
+        playerSelection.setBounds(20, 50, 400, 15);
 
         add(board);
-        board.setBounds(20, 100, 1000, 500);
+        board.setBounds(120, 70, 280, 200);
 
         add(serverMessage);
-        serverMessage.setBounds(20, 700, 1400, 15);
+        serverMessage.setBounds(20, 250, 400, 15);
 
         // call board renderer
         renderBoard();
@@ -81,6 +81,17 @@ public class UserInterface extends JFrame implements KeyListener {
      */
     public void receiveServerMessage(int[][] msg) {
         if (msg[0][0] >= 0){
+            // remove blockers on sending
+            if (!yMove) {
+                if (submitted) {
+                    submitted = false;
+                    changeServerMessage("Awaiting Server move...");
+                } else {
+                    yMove = true;
+                    changeServerMessage("Make Your Move...");
+                }
+            }
+            // update board
             updateBoardState(msg);
         }
     }
@@ -89,13 +100,15 @@ public class UserInterface extends JFrame implements KeyListener {
      * method to submit the selection
      */
     public void submitCoordinates() {
-        // notify 
-        serverMessage.setText("Submitting...");
-
         // do not submit if already submitted
         if (!submitted && yMove) {
             // call checker
             if (chk.checkValidity(cursor)) {
+                // put blockers to prevent out-of-turn submission
+                submitted = true;
+                yMove = false;
+                // notify 
+                changeServerMessage("Submitting...");
                 // send coordinates
                 client.sendPlayerMove(cursor);
 
@@ -122,7 +135,7 @@ public class UserInterface extends JFrame implements KeyListener {
      * render the board
      */
     private void renderBoard() {
-        String tBoardOut = "<html>";
+        String tBoardOut = "<html><pre>";
 
         // generate render
         for (int y = 0; y < boardState.length; y++) {
@@ -142,13 +155,13 @@ public class UserInterface extends JFrame implements KeyListener {
                 }
 
                 if (x == cursor[0] && y == cursor[1]) // add selection indicator
-                    tBoardOut += "\t{" + t + "}";
+                    tBoardOut += "{" + t + "}";
                 else
-                    tBoardOut += "\t " + t + " ";
+                    tBoardOut += " " + t + " ";
             }
             tBoardOut += "<br>";
         }
-        tBoardOut += "</html>";
+        tBoardOut += "</pre></html>";
 
         // output
         board.setText(tBoardOut);
@@ -189,6 +202,12 @@ public class UserInterface extends JFrame implements KeyListener {
             case 10:
                 submitCoordinates();
                 break;
+
+            // esc - THIS TERMINATES THE PROGRAM
+            case 27:
+                System.exit(0);
+                break;
+
             default:
                 break;
         }
