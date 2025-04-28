@@ -43,7 +43,7 @@ public class UserInterface extends JFrame implements KeyListener {
 
         // set up gui
         setTitle("Othello");
-        setSize(1600, 900);
+        setSize(450, 350);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -55,16 +55,16 @@ public class UserInterface extends JFrame implements KeyListener {
 
         // add labels
         add(instructions);
-        instructions.setBounds(20, 20, 1400, 15);
+        instructions.setBounds(20, 20, 400, 15);
 
         add(playerSelection);
-        playerSelection.setBounds(20, 50, 1400, 15);
+        playerSelection.setBounds(20, 50, 400, 15);
 
         add(board);
-        board.setBounds(20, 100, 1000, 500);
+        board.setBounds(120, 70, 280, 200);
 
         add(serverMessage);
-        serverMessage.setBounds(20, 700, 1400, 15);
+        serverMessage.setBounds(20, 250, 400, 15);
 
         // call board renderer
         renderBoard();
