@@ -43,7 +43,16 @@ public class Client {
                 int[] lastMove = null;
 
                 ArrayList<int[]> clientUpdatedCoords = receiveClientUpdatedCoords();
-                ui.receiveServerMessage((int[][]) clientUpdatedCoords.toArray());
+                OthelloPlayer.updateBoard(othelloPlayer.getBoard(), clientUpdatedCoords);
+
+                int[][] updatedCoords = new int[clientUpdatedCoords.size()][clientUpdatedCoords.get(0).length];
+
+                for (int i = 0; i < clientUpdatedCoords.size(); i++)
+                {
+                    updatedCoords[i] = clientUpdatedCoords.get(i).clone();
+                }
+
+                ui.receiveServerMessage(updatedCoords);
 
                 int[] serverMove = receiveServerMove();
 
