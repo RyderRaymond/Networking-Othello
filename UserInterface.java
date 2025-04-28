@@ -13,8 +13,8 @@ import javax.swing.JLabel;
 public class UserInterface extends JFrame implements KeyListener {
     private int boardState[][]; // 2d array to hold the board state that will be displayed to the player
     private int cursor[]; // what you are selecting
-    private boolean submitted;
-    private boolean yMove;
+    private boolean submitted; // blocker for submitting
+    private boolean yMove; //blocker for turn
     private JLabel playerSelection; // displays coordinate selection
     private JLabel board; // place to output the board to
     private JLabel instructions; // tells controls
@@ -48,7 +48,7 @@ public class UserInterface extends JFrame implements KeyListener {
         setLocationRelativeTo(null);
 
         // prepare labels and frame
-        instructions = new JLabel("Select with arrow keys. Confirm with Enter. You are \u25cb.");
+        instructions = new JLabel("Select with arrow keys. Confirm with Enter. You are \u25cb. ESC to exit.");
         playerSelection = new JLabel("Selected: {" + cursor[0] + "," + cursor[1] + "}");
         board = new JLabel("");
         serverMessage = new JLabel("Make Your Move...");
@@ -81,6 +81,17 @@ public class UserInterface extends JFrame implements KeyListener {
      */
     public void receiveServerMessage(int[][] msg) {
         if (msg[0][0] >= 0){
+            // remove blockers on sending
+            if (!yMove) {
+                if (submitted) {
+                    submitted = false;
+                    changeServerMessage("Awaiting Server move...");
+                } else {
+                    yMove = true;
+                    changeServerMessage("Make Your Move...");
+                }
+            }
+            // update board
             updateBoardState(msg);
         }
     }
@@ -89,13 +100,15 @@ public class UserInterface extends JFrame implements KeyListener {
      * method to submit the selection
      */
     public void submitCoordinates() {
-        // notify 
-        serverMessage.setText("Submitting...");
-
         // do not submit if already submitted
         if (!submitted && yMove) {
             // call checker
             if (chk.checkValidity(cursor)) {
+                // put blockers to prevent out-of-turn submission
+                submitted = true;
+                yMove = false;
+                // notify 
+                changeServerMessage("Submitting...");
                 // send coordinates
                 client.sendPlayerMove(cursor);
 
