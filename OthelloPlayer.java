@@ -5,7 +5,7 @@ public class OthelloPlayer {
   public static final Color PLAYER = Color.PLAYER;
   public static final Color AI = Color.AI;
   public Color color;
-  public Color[][] board = new Color[][] {
+  public Color[][] myBoard = new Color[][] {
     {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
     {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
     {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY},
@@ -24,8 +24,16 @@ public class OthelloPlayer {
   }
 
   public Color[][] getBoard() {
-    return board;
+    return myBoard;
   } //comment
+
+  public static Color[][] deepCopyBoard(Color[][] board) {
+    Color[][] copy = new Color[board.length][board[0].length];
+    for (int i = 0; i < board.length; i++) {
+        System.arraycopy(board[i], 0, copy[i], 0, board[i].length);
+    }
+    return copy;
+  }
 
   public static int count(Color[][] board, Color color) { // Counts the number of pieces of the given color on the board
     int count = 0;
@@ -58,7 +66,8 @@ public class OthelloPlayer {
     return validMoves;
   }
 
-  public static int bestOutcome(Color[][] board, Color color) { // Returns the best outcome for the given color
+  public static int bestOutcome(Color[][] aBoard, Color color) { // Returns the best outcome for the given color
+    Color[][] board = deepCopyBoard(aBoard);
     ArrayList<int[]> moves = getMoves(board, color);
     int bestOutcome = 0;
     if (moves.get(0)[0] == -1) return 0; // No valid moves available
@@ -67,8 +76,9 @@ public class OthelloPlayer {
       if(isCorner(move)) outcome += 20; // Corner captured
       if(isEdge(move)) outcome += 5; // Edge captured
       if(isNextToCorner(move)) outcome -= 15; // Next to corner
-      ArrayList<int[]> changes = place(board, move, color); // get changed tiles
-      Color[][] newBoard = updateBoard(board, changes); // update the board
+      Color[][] newBoard = deepCopyBoard(board);
+      ArrayList<int[]> changes = place(newBoard, move, color); // get changed tiles
+      newBoard = updateBoard(newBoard, changes); // update the board
       outcome += count(newBoard, color) - count(newBoard, color == PLAYER ? AI : PLAYER);
       if (outcome > bestOutcome) bestOutcome = outcome; // Update best outcome
       // Compare outcomes and return the best one
@@ -76,7 +86,8 @@ public class OthelloPlayer {
     return bestOutcome;
   }
 
-  public static ArrayList<int[]> place(Color[][] board, int[] coord, Color color) { // returns the array of changed tiles
+  public static ArrayList<int[]> place(Color[][] aBoard, int[] coord, Color color) { // returns the array of changed tiles
+    Color[][] board = deepCopyBoard(aBoard);
     ArrayList<int[]> changes = new ArrayList<>();
     int[] placedTile = new int[2];
     placedTile[0] = coord[1];
@@ -119,8 +130,8 @@ public class OthelloPlayer {
     // must call updateBoard(changes) to update the board
   }
 
-  public static Color[][] placeOnBoard(Color[][] board, int[] coord, Color color) { // returns a new board after the move
-
+  public static Color[][] placeOnBoard(Color[][] aBoard, int[] coord, Color color) { // returns a new board after the move
+    Color[][] board = deepCopyBoard(aBoard);
     int[] placedTile = new int[2];
     placedTile[0] = coord[1];
     placedTile[1] = coord[0];
@@ -158,11 +169,12 @@ public class OthelloPlayer {
       int x = change[0];
       int y = change[1];
       Color color = Color.values()[change[2]];
-      board[x][y] = color;
+      myBoard[x][y] = color;
     }
   }
 
-  public static Color[][] updateBoard(Color[][] board, ArrayList<int[]> changes) { // given the array of changed tiles, update the board
+  public static Color[][] updateBoard(Color[][] aBoard, ArrayList<int[]> changes) { // given the array of changed tiles, update the board
+    Color[][] board = deepCopyBoard(aBoard);
     for (int[] change: changes){
       int x = change[0];
       int y = change[1];
@@ -173,7 +185,8 @@ public class OthelloPlayer {
   }
 
   public static boolean isValidMove(Color[][] aBoard, int[] coord, Color aColor) { // Checks if a move on a given board is valid
-    if (aBoard[coord[0]][coord[1]] != EMPTY) return false; // Tile is already occupied
+    Color[][] board = deepCopyBoard(aBoard);
+    if (board[coord[0]][coord[1]] != EMPTY) return false; // Tile is already occupied
     Color opponentColor = (aColor == PLAYER) ? AI : PLAYER; // Determine the opponent's color
     int[] placedTile = coord;
     for (int x = -1; x <= 1; x++) {
@@ -182,9 +195,9 @@ public class OthelloPlayer {
         int i = placedTile[0] + x;
         int j = placedTile[1] + y;
         // Check if the move is within bounds and if there are opponent pieces in the direction of the move
-        while (i >= 0 && i < 8 && j >= 0 && j < 8 && aBoard[i][j] == opponentColor) {
+        while (i >= 0 && i < 8 && j >= 0 && j < 8 && board[i][j] == opponentColor) {
           if (i+x < 0 || i+x >= 8 || j+y < 0 || j+y >= 8) break; // Out of bounds
-          if (aBoard[i+x][j+y] == aColor) return true; // Valid move
+          if (board[i+x][j+y] == aColor) return true; // Valid move
           i += x;
           j += y;
         }
@@ -266,13 +279,20 @@ public class OthelloPlayer {
     }
   }
 
+  public static void printChanges(ArrayList<int[]> changes) {
+    for (int[] change : changes) {
+      System.out.print("x: " + change[0] + ", y: " + change[1] + ", color: " + Color.values()[change[2]] + "\n");
+    }
+    System.out.println();
+  }
+
   public static void main(String[] args) {
     // Initialize the board
     Color[][] board = new Color[][] {
         {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY},
-        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.PLAYER, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY},
-        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.PLAYER, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY},
-        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.PLAYER, Color.AI, Color.EMPTY, Color.EMPTY, Color.EMPTY},
+        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY},
+        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.PLAYER, Color.EMPTY, Color.EMPTY, Color.EMPTY},
+        {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.PLAYER, Color.PLAYER, Color.EMPTY, Color.EMPTY, Color.EMPTY},
         {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.AI, Color.PLAYER, Color.EMPTY, Color.EMPTY, Color.EMPTY},
         {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY},
         {Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY, Color.EMPTY},
@@ -302,8 +322,10 @@ public class OthelloPlayer {
     }
     */
     // Make a move
-    int[] move = {3, 0}; // Example move
+    int[] move = {3, 2}; // Example move
     ArrayList<int[]> changes = OthelloPlayer.place(board, move, Color.AI); // Get changed tiles
+    System.out.println("Changes:");
+    OthelloPlayer.printChanges(changes); // Print the changes
     Color[][] updatedBoard = OthelloPlayer.updateBoard(board, changes); // Update the board using changes
     //Color[][] updatedBoard = OthelloPlayer.placeOnBoard(board, move, Color.AI); // Update the board using the move
 

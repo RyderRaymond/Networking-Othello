@@ -25,7 +25,8 @@ public class Checker { // clientside class that checks the player's moves
     this.board = board; //comment
   }
 
-  public boolean checkValidity(int[] coord) {
+  public boolean checkValidity(int[] aCoord) {
+    int[] coord = {aCoord[1], aCoord[0]};
     if (board[coord[0]][coord[1]] != EMPTY) return false; // Tile is already occupied
     Color opponentColor = AI;
     int[] placedTile = coord;

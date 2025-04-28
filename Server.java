@@ -84,6 +84,7 @@ class ServerThread extends Thread {
 
             ArrayList<int[]> playerUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), playerCoord, Color.PLAYER);
             aiPlayer.updateBoard(playerUpdatedCoords);
+            OthelloPlayer.printBoard(aiPlayer.getBoard());
 
             // Send playerUpdatedCoords to player
             sendClientUpdatedCoords(playerCoord, playerUpdatedCoords);
@@ -103,8 +104,12 @@ class ServerThread extends Thread {
                 endGame();
                 break;
             }
-
+            System.out.println("Server move: " + serverMove[0] + "," + serverMove[1]);
+            //OthelloPlayer.printBoard(aiPlayer.getBoard());
             ArrayList<int[]> serverUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), serverMove, Color.AI);
+            //OthelloPlayer.printChanges(serverUpdatedCoords);
+            aiPlayer.updateBoard(serverUpdatedCoords);
+            //OthelloPlayer.printBoard(aiPlayer.getBoard());
 
             sendServerUpdatedCoords(serverMove, serverUpdatedCoords);
         } while (true); //keep playing until someone loses or wins
@@ -232,15 +237,17 @@ class ServerThread extends Thread {
       int[] weights = new int[moves.size()];
       for (int i = 0; i < moves.size(); i++) {
           int[] move = moves.get(i);
-          Color[][] nextBoard = OthelloPlayer.placeOnBoard(aiPlayer.getBoard(), move, aiColor);
+          Color[][] nextBoard = OthelloPlayer.placeOnBoard(OthelloPlayer.deepCopyBoard(aiPlayer.getBoard()), move, aiColor);
 
           int weight = OthelloPlayer.count(nextBoard, aiColor);
           if (OthelloPlayer.isCorner(move)) weight += 20;
           if (OthelloPlayer.isEdge(move)) weight += 5;
           if (OthelloPlayer.isNextToCorner(move)) weight -= 15;
-
+          //System.out.println("before bestOutcome: ");
+          //OthelloPlayer.printBoard(aiPlayer.getBoard());
           weight -= OthelloPlayer.bestOutcome(nextBoard, Color.PLAYER);
-
+          //System.out.println("after bestOutcome: ");
+          //OthelloPlayer.printBoard(aiPlayer.getBoard());
           weights[i] = weight;
           if (weight > bestWeight) {
               bestWeight = weight;

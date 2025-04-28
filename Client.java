@@ -43,20 +43,28 @@ public class Client {
                 int[] lastMove = null;
 
                 ArrayList<int[]> clientUpdatedCoords = receiveClientUpdatedCoords();
+                checkGameOver(clientUpdatedCoords.get(0));
                 OthelloPlayer.updateBoard(othelloPlayer.getBoard(), clientUpdatedCoords);
 
                 int[][] updatedCoords = new int[clientUpdatedCoords.size()][clientUpdatedCoords.get(0).length];
-
                 for (int i = 0; i < clientUpdatedCoords.size(); i++)
                 {
                     updatedCoords[i] = clientUpdatedCoords.get(i).clone();
                 }
-
                 ui.receiveServerMessage(updatedCoords);
 
                 int[] serverMove = receiveServerMove();
 
-                ArrayList<int[]> serverUpdatedCoords = receiveServerUpdatedcoords();
+                ArrayList<int[]> serverUpdatedCoords = receiveServerUpdatedCoords();
+                checkGameOver(serverUpdatedCoords.get(0));
+                OthelloPlayer.updateBoard(othelloPlayer.getBoard(), serverUpdatedCoords);
+
+                int[][] serverUpdatedCoordsArray = new int[serverUpdatedCoords.size()][serverUpdatedCoords.get(0).length];
+                for (int i = 0; i < serverUpdatedCoords.size(); i++)
+                {
+                    serverUpdatedCoordsArray[i] = serverUpdatedCoords.get(i).clone();
+                }
+                ui.receiveServerMessage(serverUpdatedCoordsArray);
 
 //            othelloPlayer.updateBoard(serverUpdatedCoords);
 //            ui.receiveServerMessage((int[][]) serverUpdatedCoords.toArray());
@@ -146,7 +154,7 @@ public class Client {
         return coord;
     }
 
-    private ArrayList<int[]> receiveServerUpdatedcoords() throws IOException
+    private ArrayList<int[]> receiveServerUpdatedCoords() throws IOException
     {
         String updatedCoords = reader.readLine();
         System.out.println("Updated coords: " + updatedCoords);
@@ -170,5 +178,36 @@ public class Client {
         }
 
         return coordinateList;
+    }
+
+    private void checkGameOver(int[] coords)
+    {
+        if(coords[0] == -1){
+          if(coords[1] == -1){
+            ui.changeServerMessage("You lost!");
+            endGame();
+          }
+          else if(coords[1] == -2){
+            ui.changeServerMessage("You won!");
+            endGame();
+          }
+          else if(coords[1] == -3){
+            ui.changeServerMessage("Draw!");
+            endGame();
+          }
+        }
+    }
+
+    private void endGame()
+    {
+        try {
+            socket.close();
+            writer.close();
+            reader.close();
+        }
+        catch (IOException ex)
+        {
+            System.out.println("Error closing sockets: " + ex.getMessage());
+        }
     }
 }
