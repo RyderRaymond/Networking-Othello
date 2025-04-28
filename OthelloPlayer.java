@@ -294,15 +294,15 @@ public class OthelloPlayer {
     }
 
     // Make a move
-    int[] move = {2, 3}; // Example move
-    ArrayList<int[]> changes = OthelloPlayer.place(board, move, Color.PLAYER); // Get changed tiles
-    Color[][] updatedBoard1 = OthelloPlayer.updateBoard(board, changes); // Update the board
-    //Color[][] updatedBoard2 = OthelloPlayer.placeOnBoard(board, move, Color.AI);
+    int[] move = {3, 2}; // Example move
+    //ArrayList<int[]> changes = OthelloPlayer.place(board, move, Color.AI); // Get changed tiles
+    //Color[][] updatedBoard1 = OthelloPlayer.updateBoard(board, changes); // Update the board using changes
+    Color[][] updatedBoard2 = OthelloPlayer.placeOnBoard(board, move, Color.AI); // Update the board using the move
 
     // Print the updated board
     System.out.println("\nUpdated Board:");
-    printBoard(updatedBoard1);
-    //printBoard(updatedBoard2);
+    //printBoard(updatedBoard1);
+    printBoard(updatedBoard2);
   }
 
 }
