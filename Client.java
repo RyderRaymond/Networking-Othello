@@ -77,52 +77,50 @@ public class Client {
                     sendPlayerMove(new int[]{-1, 0});
                 }
 
-                ArrayList<int[]> clientUpdatedCoords = receiveClientUpdatedCoords();
-                checkGameOver(clientUpdatedCoords.get(0));
+                int[] notifOrClientCoord = receiveCoordinateOrNotification();
 
-                if (clientUpdatedCoords.get(0)[0] != -1) {
+                if (checkGameOver(notifOrClientCoord)) {
+                    break;
+                }
+                else if (Arrays.equals(notifOrClientCoord, noValidMove)) {
+
+                }
+                else {
+                    ArrayList<int[]> clientUpdatedCoords = receiveClientUpdatedCoords();
                     othelloPlayer.updateBoard(clientUpdatedCoords);
+
+                    int[][] updatedCoords = new int[clientUpdatedCoords.size()][clientUpdatedCoords.get(0).length];
+                    for (int i = 0; i < clientUpdatedCoords.size(); i++) {
+                        updatedCoords[i] = clientUpdatedCoords.get(i).clone();
+                    }
+                    ui.receiveServerMessage(updatedCoords);
                 }
 
-                int[][] updatedCoords = new int[clientUpdatedCoords.size()][clientUpdatedCoords.get(0).length];
-                for (int i = 0; i < clientUpdatedCoords.size(); i++)
-                {
-                    updatedCoords[i] = clientUpdatedCoords.get(i).clone();
+
+                int[] notifOrServerMove = receiveServerMove();
+
+                if (checkGameOver(notifOrServerMove)) {
+                    break;
                 }
-                ui.receiveServerMessage(updatedCoords);
+                else if (Arrays.equals(notifOrServerMove, noValidMove)) {
 
-                int[] serverMove = receiveServerMove();
-
-                ArrayList<int[]> serverUpdatedCoords = receiveServerUpdatedCoords();
-                checkGameOver(serverUpdatedCoords.get(0));
-
-                if (serverUpdatedCoords.get(0)[0] != -1) {
+                }
+                else {
+                    ArrayList<int[]> serverUpdatedCoords = receiveServerUpdatedCoords();
                     othelloPlayer.updateBoard(serverUpdatedCoords);
+
+                    int[][] serverUpdatedCoordsArray = new int[serverUpdatedCoords.size()][serverUpdatedCoords.get(0).length];
+                    for (int i = 0; i < serverUpdatedCoords.size(); i++)
+                    {
+                        serverUpdatedCoordsArray[i] = serverUpdatedCoords.get(i).clone();
+                    }
+
+                    ui.receiveServerMessage(serverUpdatedCoordsArray);
                 }
 
-                int[][] serverUpdatedCoordsArray = new int[serverUpdatedCoords.size()][serverUpdatedCoords.get(0).length];
-                for (int i = 0; i < serverUpdatedCoords.size(); i++)
-                {
-                    serverUpdatedCoordsArray[i] = serverUpdatedCoords.get(i).clone();
-                }
-
-
-                ui.receiveServerMessage(serverUpdatedCoordsArray);
 
 //            othelloPlayer.updateBoard(serverUpdatedCoords);
 //            ui.receiveServerMessage((int[][]) serverUpdatedCoords.toArray());
-
-
-                //While the game is running
-                //Update board
-                //Have user input move
-                //Send move to server
-                //if valid, accept, wait 5 seconds, and send server's move
-
-                //if no more valid moves on either side
-                //procedure to end game
-                //print to client who won
-                //close connection
             }
         }
         catch (IOException ex)
@@ -142,6 +140,18 @@ public class Client {
         }
     }
 
+    private int[] receiveCoordinateOrNotification() throws IOException
+    {
+        String coordStr = reader.readLine();
+        String[] split = coordStr.split(",");
+        int[] finalCoord = new int[] {
+                Integer.parseInt(split[0]),
+                Integer.parseInt(split[1])
+        };
+
+        return finalCoord;
+    }
+
     protected void sendPlayerMove(int[] playerMove)
     {
         try {
@@ -155,22 +165,6 @@ public class Client {
 
     private ArrayList<int[]> receiveClientUpdatedCoords() throws IOException
     {
-        String lastMove = reader.readLine();
-        System.out.println("Read last move: " + lastMove);
-
-        String[] lastMoveOrWinConStr = lastMove.split(",");
-
-        int[] lastMoveOrWinCon = new int[] {
-                Integer.parseInt(lastMoveOrWinConStr[0]),
-                Integer.parseInt(lastMoveOrWinConStr[1])
-        };
-
-        if (lastMoveOrWinCon[0] == -1) {
-            ArrayList<int[]> coordinateList = new ArrayList<>();
-            coordinateList.add(new int[] {lastMoveOrWinCon[0], lastMoveOrWinCon[1], 1});
-            return coordinateList;
-        }
-
         String updatedCoords = reader.readLine();
         System.out.println("Updated coords from client move: " + updatedCoords);
         String[] coords = updatedCoords.split("\\|");
@@ -236,22 +230,26 @@ public class Client {
         return coordinateList;
     }
 
-    private void checkGameOver(int[] coords)
+    private boolean checkGameOver(int[] coords)
     {
         if(coords[0] == -1){
           if(coords[1] == -1){
             ui.changeServerMessage("You lost!");
             endGame();
+            return true;
           }
           else if(coords[1] == -2){
             ui.changeServerMessage("You won!");
             endGame();
+            return true;
           }
           else if(coords[1] == -3){
             ui.changeServerMessage("Draw!");
             endGame();
+            return true;
           }
         }
+        return false;
     }
 
     private void endGame()

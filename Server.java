@@ -93,6 +93,7 @@ class ServerThread extends Thread {
                     ArrayList<int[]> playerUpdatedCoords = new ArrayList<>();
                     playerUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), playerCoord, Color.PLAYER);
                     aiPlayer.updateBoard(playerUpdatedCoords);
+                    sendCoordOrNotification(playerCoord);
                     sendClientUpdatedCoords(playerUpdatedCoords);
                 }
 
