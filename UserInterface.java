@@ -80,7 +80,7 @@ public class UserInterface extends JFrame implements KeyListener {
      * method to receive a list of coordinates or a message from the server/checker
      */
     public void receiveServerMessage(int[][] msg) {
-        if (msg[0][0] >= 0){
+        if (msg[0][0] >= -1){
             // remove blockers on sending
             if (!yMove) {
                 if (submitted) {
@@ -91,7 +91,8 @@ public class UserInterface extends JFrame implements KeyListener {
                     changeServerMessage("Make Your Move...");
                 }
             }
-            // update board
+            if (msg[0][0] >= 0)
+            // update board if there was a move made
             updateBoardState(msg);
         }
     }
