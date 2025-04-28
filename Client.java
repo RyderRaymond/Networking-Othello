@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Client {
     private Socket socket;
@@ -19,9 +20,25 @@ public class Client {
     }
 
     public static void main(String[] args) {
+        Scanner keyboard = new Scanner(System.in);
         try {
-            String host = "localhost";
-            int port = 9999;
+            String host = "";
+            int port = -1;
+
+            System.out.print("Enter the host to connect to: ");
+
+            host = keyboard.nextLine();
+
+            System.out.print("Enter the port the server is listening on: ");
+            do {
+                String maybePort = keyboard.nextLine();
+                try {
+                    port = Integer.parseInt(maybePort);
+                }
+                catch (Exception e) {
+                    System.out.print("Invalid port.\nEnter a port: ");
+                }
+            } while (port < 0);
 
             Socket socket = new Socket(host, port);
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));

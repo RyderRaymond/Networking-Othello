@@ -8,8 +8,10 @@ public class Server {
 
     public static void main(String[] args) {
         Scanner keyboard = new Scanner(System.in);
+
         System.out.print("Enter the port on which to listen: ");
         int port = -1;
+        
         do {
             String maybePort = keyboard.nextLine();
             try {
