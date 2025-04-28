@@ -122,7 +122,7 @@ public class UserInterface extends JFrame implements KeyListener {
      * render the board
      */
     private void renderBoard() {
-        String tBoardOut = "<html>";
+        String tBoardOut = "<html><pre>";
 
         // generate render
         for (int y = 0; y < boardState.length; y++) {
@@ -142,13 +142,13 @@ public class UserInterface extends JFrame implements KeyListener {
                 }
 
                 if (x == cursor[0] && y == cursor[1]) // add selection indicator
-                    tBoardOut += "\t{" + t + "}";
+                    tBoardOut += "{" + t + "}";
                 else
-                    tBoardOut += "\t " + t + " ";
+                    tBoardOut += " " + t + " ";
             }
             tBoardOut += "<br>";
         }
-        tBoardOut += "</html>";
+        tBoardOut += "</pre></html>";
 
         // output
         board.setText(tBoardOut);
