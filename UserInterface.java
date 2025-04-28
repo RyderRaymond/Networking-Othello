@@ -94,6 +94,7 @@ public class UserInterface extends JFrame implements KeyListener {
             // call checker
             if (chk.checkValidity(cursor)) {
                 // send coordinates
+
             } else {
                 changeServerMessage("Invalid Move...Try Again");
             }
@@ -107,7 +108,7 @@ public class UserInterface extends JFrame implements KeyListener {
         for(int x,y,i = 0; i < uCoords.length; i++) {
             x = uCoords[i][0];
             y = uCoords[i][1];
-            boardState[x][y] = uCoords[i][3];
+            boardState[x][y] = uCoords[i][2];
         }
         chk.updateBoard(uCoords);
     }
