@@ -14,7 +14,8 @@ public class Client {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            new ClientPlayer(socket, writer, reader).play();
+            ClientPlayer player =new ClientPlayer(socket, writer, reader);
+            player.play();
 
 
             reader.readLine();
@@ -35,6 +36,7 @@ class ClientPlayer {
     private BufferedWriter writer;
     private BufferedReader reader;
     private OthelloPlayer othelloPlayer;
+    private UserInterface ui;
 
     public ClientPlayer(Socket socket, BufferedWriter writer, BufferedReader reader)
     {
@@ -42,12 +44,12 @@ class ClientPlayer {
         this.writer = writer;
         this.reader = reader;
         othelloPlayer = new OthelloPlayer(Color.PLAYER);
+        ui = new UserInterface(this);
     }
 
     public void play() {
         try {
             int[] lastMove = null;
-            UserInterface ui = new UserInterface();
 
             sendPlayerMove(new int[]{3, 5});
             int[][] clientUpdatedCoords = receiveClientUpdatedCoords();
@@ -81,11 +83,13 @@ class ClientPlayer {
 
     private void sendPlayerMove(int[] playerMove) throws IOException
     {
-        String moveToSend = "" + playerMove[0] + "," + playerMove[1];
-        System.out.println("Sending move: " + moveToSend);
-        writer.write(moveToSend);
-        writer.newLine();
-        writer.flush();
+        try {
+            String moveToSend = "" + playerMove[0] + "," + playerMove[1];
+            System.out.println("Sending move: " + moveToSend);
+            writer.write(moveToSend);
+            writer.newLine();
+            writer.flush();
+        } catch (Exception e) {}
     }
 
     private int[][] receiveClientUpdatedCoords() throws IOException
@@ -117,7 +121,7 @@ class ClientPlayer {
         }
 
         System.out.println(coordinateList.size());
-        int[][] result = new int[coordinateList.size()][coordinateList.getFirst().length];
+        int[][] result = new int[coordinateList.size()][coordinateList.get(0).length];
 
         for (int i = 0; i < coordinateList.size(); i++) {
             System.out.println(i);
