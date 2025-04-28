@@ -49,7 +49,7 @@ public class Server {
 }
 
 class ServerThread extends Thread {
-    private static final int sleepTimeAfterSendUpdate = 5000;
+    private static final int sleepTimeAfterSendUpdate = 1;
 
     private static final int[] noValidMove = new int[] {-1, 0};
     private static final int[] playerLoses = new int[] {-1, -1};
@@ -85,7 +85,13 @@ class ServerThread extends Thread {
                     break;
                 }
 
-                ArrayList<int[]> playerUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), playerCoord, Color.PLAYER);
+                ArrayList<int[]> playerUpdatedCoords = new ArrayList<>();
+                if (!Arrays.equals(playerCoord, noValidMove)) {
+                    playerUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), playerCoord, Color.PLAYER);
+                }
+                else {
+                    playerUpdatedCoords.add(new int[] {-1, 0, 0});
+                }
 
                 if (playerUpdatedCoords.get(0)[0] != -1) {
                     aiPlayer.updateBoard(playerUpdatedCoords);
@@ -120,7 +126,9 @@ class ServerThread extends Thread {
                     sendServerUpdatedCoords(serverMove, serverUpdatedCoords);
                 }
                 else {
-                    sendServerUpdatedCoords(serverMove, null);
+                    ArrayList<int[]> serverUpdatedCoords = new ArrayList<>();
+                    serverUpdatedCoords.add(new int[] {-1, 0, 1});
+                    sendServerUpdatedCoords(serverMove, serverUpdatedCoords);
                 }
             } while (true); //keep playing until someone loses or wins
         }
