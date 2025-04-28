@@ -42,6 +42,12 @@ public class Client {
 
                 int[] lastMove = null;
 
+                Color color = Color.PLAYER; // Define the color variable
+                if (OthelloPlayer.getMoves(othelloPlayer.getBoard(), color).get(0)[0] == -1) {
+                    ui.changeServerMessage("No valid moves available. Waiting for opponent...");
+                    sendPlayerMove(new int[]{-1, -1});
+                }
+
                 ArrayList<int[]> clientUpdatedCoords = receiveClientUpdatedCoords();
                 checkGameOver(clientUpdatedCoords.get(0));
                 OthelloPlayer.updateBoard(othelloPlayer.getBoard(), clientUpdatedCoords);

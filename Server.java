@@ -47,7 +47,7 @@ public class Server {
 }
 
 class ServerThread extends Thread {
-    private static final int sleepTimeAfterSendUpdate = 5;
+    private static final int sleepTimeAfterSendUpdate = 5000;
 
     private static final int[] noValidMove = new int[] {-1, 0};
     private static final int[] playerLoses = new int[] {-1, -1};
