@@ -107,8 +107,8 @@ class ServerThread extends Thread {
                 }
 
                 // AI Logic to get the best move and call it on that
-                int[] serverMove = makeBadServerMove(); // Easy AI
-//                int[] serverMove = makeServerMove(); // Hard AI
+//                int[] serverMove = makeBadServerMove(); // Easy AI
+                int[] serverMove = makeServerMove(); // Hard AI
                 System.out.println("Server move: " + serverMove[0] + "," + serverMove[1]);
                 lastMove = serverMove;
 
