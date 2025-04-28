@@ -119,12 +119,6 @@ class ServerThread extends Thread {
                 }
                 else if (Arrays.equals(serverMove, noValidMove))
                 {
-                    //OthelloPlayer.printBoard(aiPlayer.getBoard());
-//                    ArrayList<int[]> serverUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), serverMove, Color.AI);
-                    //OthelloPlayer.printChanges(serverUpdatedCoords);
-//                    aiPlayer.updateBoard(serverUpdatedCoords);
-                    //OthelloPlayer.printBoard(aiPlayer.getBoard());
-//                    sendServerUpdatedCoords(serverMove, serverUpdatedCoords);
                     sendCoordOrNotification(noValidMove);
                 }
                 else {
@@ -160,28 +154,21 @@ class ServerThread extends Thread {
 
     //Client should send data as "coord, coord"
     //Example: "2,5"
-    private int[] getPlayerMove() {
+    private int[] getPlayerMove() throws IOException
+    {
         int[] playerMove = null;
 
-//        do //keep trying to read in case we get an IO error and the move isn't correctly received
-//        {
-            try {
-                String str_player_move = reader.readLine();
-                System.out.println("String: " + str_player_move);
+        String str_player_move = reader.readLine();
+        System.out.println("String: " + str_player_move);
 
-                // Split the data sent from the client by ','
-                // So if the reader reads "4,6" it parses to an array index 0 = 4, index 1 = 6
-                String[] coordNums = str_player_move.split(",");
-                System.out.println("CoordNums: " + coordNums.toString());
+        // Split the data sent from the client by ','
+        // So if the reader reads "4,6" it parses to an array index 0 = 4, index 1 = 6
+        String[] coordNums = str_player_move.split(",");
 
-                playerMove = new int[2];
-                playerMove[0] = Integer.parseInt(coordNums[0]);
-                playerMove[1] = Integer.parseInt(coordNums[1]);
-            }
-            catch (Exception ex) {
-                System.out.println("Problem receiving coordinate from client: " + ex.getMessage());
-            }
-//        } while (playerMove == null);
+        playerMove = new int[2];
+        playerMove[0] = Integer.parseInt(coordNums[0]);
+        playerMove[1] = Integer.parseInt(coordNums[1]);
+
 
         System.out.println("Received coordinate from client: (" + playerMove[0] + "," + playerMove[1] + ")" );
         return playerMove;
@@ -191,26 +178,16 @@ class ServerThread extends Thread {
     // See parseListOfCoordinates to see what the string looks like
 
     // Basically, every time the client tries to read from the server the coordinates the Player's last move updated,
-    // and whenver the client is trying to read the server's updated coordinates, it needs to read a single coordinate as one line,
+    // and whenever the client is trying to read the server's updated coordinates, it needs to read a single coordinate as one line,
     // and then determine if that is a valid coordinate or if it is a notification that someone has won.
     // If someone won, display who won
     // If no one won and this is a real coordinate, display the coordinates changed
-    private void sendClientUpdatedCoords(ArrayList<int[]> coordsChanged) {
-
+    private void sendClientUpdatedCoords(ArrayList<int[]> coordsChanged) throws IOException {
         String coordsToSend = parseListOfCoordinates(coordsChanged);
 
-        boolean successfullySent = true;
-
-//        do {
-            try {
-                writer.write(coordsToSend);
-                writer.newLine();
-                writer.flush();
-                successfullySent = true;
-            } catch (IOException ex) {
-                successfullySent = false;
-            }
-//        } while (!successfullySent);
+        writer.write(coordsToSend);
+        writer.newLine();
+        writer.flush();
     }
 
     private void sendCoordOrNotification(int[] coord) throws IOException
@@ -222,22 +199,13 @@ class ServerThread extends Thread {
     }
 
     // When the client reads the server's updated coordinates,
-    private void sendServerUpdatedCoords(ArrayList<int[]> coordsChanged)
+    private void sendServerUpdatedCoords(ArrayList<int[]> coordsChanged) throws IOException
     {
         String coordsToSend = parseListOfCoordinates(coordsChanged);
 
-
-        boolean successfullySent = true;
-//        do {
-            try {
-                writer.write(coordsToSend);
-                writer.newLine();
-                writer.flush();
-            }
-            catch (IOException ex) {
-                successfullySent = false;
-            }
-//        } while (!successfullySent);
+        writer.write(coordsToSend);
+        writer.newLine();
+        writer.flush();
     }
 
     // Takes in the ArrayList of changed coordinates on the board and creates a string that will be sent to the client
@@ -245,9 +213,7 @@ class ServerThread extends Thread {
     private String parseListOfCoordinates(ArrayList<int[]> coordsChanged) {
         String coordsToSend = "";
 
-        for (int coordIndex = 0; coordIndex < coordsChanged.size(); coordIndex++) {
-            int[] currentCoordinate = coordsChanged.get(coordIndex);
-
+        for (int[] currentCoordinate : coordsChanged) {
             // coordsToSend will look like "2,3,1|5,8,0|0,1,2"
             // You can get the coords using String.split("|") and then individual numbers in the coord with String.split(",")
             coordsToSend += currentCoordinate[0] + "," + currentCoordinate[1] + "," + currentCoordinate[2] + "|";
@@ -316,7 +282,8 @@ class ServerThread extends Thread {
     }
 
     // Needs to send who wins or loses to the client and then end the connection
-    private void endGame() {
+    private void endGame() throws IOException
+    {
         System.out.println("Ending game");
         Color winner = OthelloPlayer.winner(aiPlayer.getBoard());
 
@@ -328,20 +295,11 @@ class ServerThread extends Thread {
         };
 
         //Send the coordinate as "-1,0" for example
-        String stringToWrite = "" + winnerCoord[0] + "," + winnerCoord[1];
+        String stringToWrite = winnerCoord[0] + "," + winnerCoord[1];
         System.out.println("Sending: " + stringToWrite);
-        boolean sentWinner = false;
 
-//        do {
-            try {
-                writer.write(stringToWrite);
-                writer.newLine();
-                writer.flush();
-                sentWinner = true;
-            }
-            catch (IOException ex) {
-                sentWinner = false;
-            }
-//        } while (!sentWinner);
+        writer.write(stringToWrite);
+        writer.newLine();
+        writer.flush();
     }
 }
