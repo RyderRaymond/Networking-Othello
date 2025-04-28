@@ -110,10 +110,10 @@ public class OthelloPlayer {
         }
       }
     }
-    System.out.println("Changes: ");
+    /*System.out.println("Changes: ");
     for (int[] change1 : changes) {
-      System.out.println("x: " + change1[0] + ", y: " + change1[1] + ", color: " + Color.values()[change1[2]]);
-    }
+      System.out.println("x: " + change1[0] + ", y: " + change1[1] + ", color: " + Color.values()[change1[2]]);}
+    */
     return changes;
     // return a list of coordinates of the pieces changed {x, y, color}
     // must call updateBoard(changes) to update the board
