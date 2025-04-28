@@ -189,6 +189,12 @@ public class UserInterface extends JFrame implements KeyListener {
             case 10:
                 submitCoordinates();
                 break;
+
+            // esc - THIS TERMINATES THE PROGRAM
+            case 27:
+                System.exit(0);
+                break;
+
             default:
                 break;
         }
