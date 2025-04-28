@@ -81,7 +81,6 @@ class ClientPlayer {
         }
     }
 
-    private void sendPlayerMove(int[] playerMove) throws IOException
     {
         try {
             String moveToSend = "" + playerMove[0] + "," + playerMove[1];
