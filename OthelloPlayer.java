@@ -78,7 +78,7 @@ public class OthelloPlayer {
   public static ArrayList<int[]> place(Color[][] board, int[] coord, Color color) { // returns the array of changed tiles
     ArrayList<int[]> changes = new ArrayList<>();
     int[] placedTile = coord;
-    int[] change = {placedTile[0], placedTile[1], color.ordinal()};
+    int[] change = {placedTile[1], placedTile[0], color.ordinal()};
     changes.add(change);
 
     // Check all 8 directions for pieces to flip
@@ -117,7 +117,7 @@ public class OthelloPlayer {
 
     int[] placedTile = coord;
     Color[][] newBoard = board;
-    newBoard[placedTile[0]][placedTile[1]] = color;
+    newBoard[placedTile[1]][placedTile[0]] = color;
 
     // Check all 8 directions for pieces to flip
     for (int x = -1; x <= 1; x++) {
