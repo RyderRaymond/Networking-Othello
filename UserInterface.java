@@ -20,11 +20,13 @@ public class UserInterface extends JFrame implements KeyListener {
     private JLabel instructions; // tells controls
     private JLabel serverMessage; // displays win/loss/waiting
     private Checker chk; // checker
-    private ClientPlayer client; // the client for sending things
+    private Client client; // the client for sending things
 
 
     // constructor
-    public UserInterface(ClientPlayer cliPlay) {
+    public UserInterface(Client cliPlay) {
+        client = cliPlay;
+
         boardState = new int[][] {
             {0,0,0,0,0,0,0,0},
             {0,0,0,0,0,0,0,0},
