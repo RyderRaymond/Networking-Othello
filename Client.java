@@ -67,10 +67,10 @@ public class Client {
 
                 Color color = Color.PLAYER; // Define the color variable
                 ArrayList<int[]> moves = OthelloPlayer.getMoves(othelloPlayer.getBoard(), color);
-                System.out.println("Valid Moves");
-                for (int[] move : moves) {
-                    System.out.println(move[0] + ", " + move[1]);
-                }
+//                System.out.println("Valid Moves");
+//                for (int[] move : moves) {
+//                    System.out.println(move[0] + ", " + move[1]);
+//                }
                 OthelloPlayer.printBoard(othelloPlayer.getBoard());
                 if (OthelloPlayer.getMoves(othelloPlayer.getBoard(), color).get(0)[0] == -1) {
                     ui.changeServerMessage("No valid moves available. Waiting for opponent...");
@@ -79,7 +79,10 @@ public class Client {
 
                 ArrayList<int[]> clientUpdatedCoords = receiveClientUpdatedCoords();
                 checkGameOver(clientUpdatedCoords.get(0));
-                othelloPlayer.updateBoard(clientUpdatedCoords);
+
+                if (clientUpdatedCoords.get(0)[0] != -1) {
+                    othelloPlayer.updateBoard(clientUpdatedCoords);
+                }
 
                 int[][] updatedCoords = new int[clientUpdatedCoords.size()][clientUpdatedCoords.get(0).length];
                 for (int i = 0; i < clientUpdatedCoords.size(); i++)
@@ -103,7 +106,7 @@ public class Client {
                     serverUpdatedCoordsArray[i] = serverUpdatedCoords.get(i).clone();
                 }
 
-                
+
                 ui.receiveServerMessage(serverUpdatedCoordsArray);
 
 //            othelloPlayer.updateBoard(serverUpdatedCoords);
@@ -155,8 +158,21 @@ public class Client {
         String lastMove = reader.readLine();
         System.out.println("Read last move: " + lastMove);
 
+        String[] lastMoveOrWinConStr = lastMove.split(",");
+
+        int[] lastMoveOrWinCon = new int[] {
+                Integer.parseInt(lastMoveOrWinConStr[0]),
+                Integer.parseInt(lastMoveOrWinConStr[1])
+        };
+
+        if (lastMoveOrWinCon[0] == -1) {
+            ArrayList<int[]> coordinateList = new ArrayList<>();
+            coordinateList.add(new int[] {lastMoveOrWinCon[0], lastMoveOrWinCon[1], 1});
+            return coordinateList;
+        }
+
         String updatedCoords = reader.readLine();
-        System.out.println("Updated coords: " + updatedCoords);
+        System.out.println("Updated coords from client move: " + updatedCoords);
         String[] coords = updatedCoords.split("\\|");
         for (String coord : coords) {
             System.out.println(coord);
@@ -197,7 +213,7 @@ public class Client {
     private ArrayList<int[]> receiveServerUpdatedCoords() throws IOException
     {
         String updatedCoords = reader.readLine();
-        System.out.println("Updated coords: " + updatedCoords);
+        System.out.println("Updated coords from server move: " + updatedCoords);
 
         String[] coords = updatedCoords.split("\\|");
         for (String coord : coords) {

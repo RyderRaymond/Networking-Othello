@@ -108,8 +108,8 @@ class ServerThread extends Thread {
                 }
 
                 // AI Logic to get the best move and call it on that
-                //int[] serverMove = makeBadServerMove(); // Easy AI
-                int[] serverMove = makeServerMove(); // Hard AI
+                int[] serverMove = makeBadServerMove(); // Easy AI
+//                int[] serverMove = makeServerMove(); // Hard AI
                 System.out.println("Server move: " + serverMove[0] + "," + serverMove[1]);
                 lastMove = serverMove;
 
@@ -320,6 +320,7 @@ class ServerThread extends Thread {
 
     // Needs to send who wins or loses to the client and then end the connection
     private void endGame() {
+        System.out.println("Ending game");
         Color winner = OthelloPlayer.winner(aiPlayer.getBoard());
 
         int[] winnerCoord = null;
@@ -330,8 +331,8 @@ class ServerThread extends Thread {
         };
 
         //Send the coordinate as "-1,0" for example
-        String stringToWrite = "" + winnerCoord[0] + "," + winnerCoord[1];
-
+        String stringToWrite = "" + winnerCoord[0] + "," + winnerCoord[1] + ",1";
+        System.out.println("Sending: " + stringToWrite);
         boolean sentWinner = false;
 
 //        do {
