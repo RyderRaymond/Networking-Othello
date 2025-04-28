@@ -103,7 +103,7 @@ public class Client {
                     break;
                 }
                 else if (Arrays.equals(notifOrServerMove, noValidMove)) {
-
+                    ui.receiveServerMessage(new int[][] { {-1, 0, 0}});
                 }
                 else {
                     ArrayList<int[]> serverUpdatedCoords = receiveServerUpdatedCoords();
