@@ -11,7 +11,7 @@ public class Server {
 
         System.out.print("Enter the port on which to listen: ");
         int port = -1;
-        
+
         do {
             String maybePort = keyboard.nextLine();
             try {
@@ -278,6 +278,34 @@ class ServerThread extends Thread {
           //System.out.println("before bestOutcome: ");
           //OthelloPlayer.printBoard(aiPlayer.getBoard());
           weight -= OthelloPlayer.bestOutcome(nextBoard, Color.PLAYER);
+          //System.out.println("after bestOutcome: ");
+          //OthelloPlayer.printBoard(aiPlayer.getBoard());
+          weights[i] = weight;
+          if (weight > bestWeight) {
+              bestWeight = weight;
+              bestMove = i;
+          }
+      }
+      return moves.get(bestMove);
+    }
+
+    private int[] makeBadServerMove() { // This is the bad AI
+      ArrayList<int[]> moves = OthelloPlayer.getMoves(aiPlayer.getBoard(), aiColor);
+      if (moves.get(0)[0] == -1) return new int[]{-1, 0}; // No valid moves available
+      int bestMove = 0;
+      int bestWeight = 0;
+      int[] weights = new int[moves.size()];
+      for (int i = 0; i < moves.size(); i++) {
+          int[] move = moves.get(i);
+          Color[][] nextBoard = OthelloPlayer.placeOnBoard(OthelloPlayer.deepCopyBoard(aiPlayer.getBoard()), move, aiColor);
+
+          int weight = 0 - OthelloPlayer.count(nextBoard, aiColor);
+          if (OthelloPlayer.isCorner(move)) weight -= 30;
+          if (OthelloPlayer.isEdge(move)) weight -= 5;
+          if (OthelloPlayer.isNextToCorner(move)) weight += 15;
+          //System.out.println("before bestOutcome: ");
+          //OthelloPlayer.printBoard(aiPlayer.getBoard());
+          weight += OthelloPlayer.bestOutcome(nextBoard, Color.PLAYER);
           //System.out.println("after bestOutcome: ");
           //OthelloPlayer.printBoard(aiPlayer.getBoard());
           weights[i] = weight;
