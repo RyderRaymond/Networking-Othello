@@ -50,9 +50,9 @@ public class OthelloPlayer {
           }
         }
       }
-      if(validMoves.isEmpty()) {
-        validMoves.add(new int[]{-1, 0}); // No valid moves available
-      }
+    }
+    if(validMoves.isEmpty()) {
+      validMoves.add(new int[]{-1, 0}); // No valid moves available
     }
     return validMoves;
   }
@@ -274,6 +274,12 @@ public class OthelloPlayer {
     // Print the initial board
     System.out.println("Initial Board:");
     printBoard(board);
+    ArrayList<int[]> moves = getMoves(board, AI);
+    System.out.println("Valid Moves:");
+    for (int[] move : moves) {
+      System.out.print("(" + move[0] + ", " + move[1] + ") ");
+    }
+    System.out.println();
 
     for (int i = 0; i < 8; i++) {
       for (int j = 0; j < 8; j++) {
