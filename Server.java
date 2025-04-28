@@ -256,9 +256,9 @@ class ServerThread extends Thread {
 
         int[] winnerCoord = null;
         winnerCoord = switch (winner) {
-            case Color.AI -> playerLoses;
-            case Color.PLAYER -> playerWins;
-            case Color.EMPTY -> tie;
+            case AI -> playerLoses;
+            case PLAYER -> playerWins;
+            case EMPTY -> tie;
         };
 
         //Send the coordinate as "-1,0" for example
