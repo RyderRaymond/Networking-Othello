@@ -81,6 +81,7 @@ class ClientPlayer {
         }
     }
 
+    protected void sendPlayerMove(int[] playerMove)
     {
         try {
             String moveToSend = "" + playerMove[0] + "," + playerMove[1];
