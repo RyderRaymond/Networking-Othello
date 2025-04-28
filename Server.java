@@ -72,47 +72,53 @@ class ServerThread extends Thread {
         int[] lastMove = null;
         int[] playerCoord = null;
 
-        do {
-            playerCoord = getPlayerMove();
+        try {
+            do {
+                playerCoord = getPlayerMove();
 
-            // Check if last move was pass and player move is pass then game is over
-            if (Arrays.equals(lastMove, noValidMove) && Arrays.equals(playerCoord, noValidMove)) {
-                // end game logic
-                endGame();
-                break;
-            }
+                // Check if last move was pass and player move is pass then game is over
+                if (Arrays.equals(lastMove, noValidMove) && Arrays.equals(playerCoord, noValidMove)) {
+                    // end game logic
+                    endGame();
+                    break;
+                }
 
-            ArrayList<int[]> playerUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), playerCoord, Color.PLAYER);
-            aiPlayer.updateBoard(playerUpdatedCoords);
-            OthelloPlayer.printBoard(aiPlayer.getBoard());
+                ArrayList<int[]> playerUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), playerCoord, Color.PLAYER);
+                aiPlayer.updateBoard(playerUpdatedCoords);
+                OthelloPlayer.printBoard(aiPlayer.getBoard());
 
-            // Send playerUpdatedCoords to player
-            sendClientUpdatedCoords(playerCoord, playerUpdatedCoords);
+                // Send playerUpdatedCoords to player
+                sendClientUpdatedCoords(playerCoord, playerUpdatedCoords);
 
-            try {
-                Thread.sleep(sleepTimeAfterSendUpdate);
-            }
-            catch (InterruptedException ex) {
-                System.out.println("Problem sleeping to let the user look at what coordinates are updated: " + ex.getMessage() + ".\nContinuing execution.");
-            }
+                try {
+                    Thread.sleep(sleepTimeAfterSendUpdate);
+                }
+                catch (InterruptedException ex) {
+                    System.out.println("Problem sleeping to let the user look at what coordinates are updated: " + ex.getMessage() + ".\nContinuing execution.");
+                }
 
-            // AI Logic to get the best move and call it on that
-            int[]  serverMove = makeServerMove();
-            lastMove = serverMove;
+                // AI Logic to get the best move and call it on that
+                int[]  serverMove = makeServerMove();
+                lastMove = serverMove;
 
-            if (Arrays.equals(serverMove, noValidMove) && Arrays.equals(playerCoord, noValidMove)) {
-                endGame();
-                break;
-            }
-            System.out.println("Server move: " + serverMove[0] + "," + serverMove[1]);
-            //OthelloPlayer.printBoard(aiPlayer.getBoard());
-            ArrayList<int[]> serverUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), serverMove, Color.AI);
-            //OthelloPlayer.printChanges(serverUpdatedCoords);
-            aiPlayer.updateBoard(serverUpdatedCoords);
-            //OthelloPlayer.printBoard(aiPlayer.getBoard());
+                if (Arrays.equals(serverMove, noValidMove) && Arrays.equals(playerCoord, noValidMove)) {
+                    endGame();
+                    break;
+                }
+                System.out.println("Server move: " + serverMove[0] + "," + serverMove[1]);
+                //OthelloPlayer.printBoard(aiPlayer.getBoard());
+                ArrayList<int[]> serverUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), serverMove, Color.AI);
+                //OthelloPlayer.printChanges(serverUpdatedCoords);
+                aiPlayer.updateBoard(serverUpdatedCoords);
+                //OthelloPlayer.printBoard(aiPlayer.getBoard());
 
-            sendServerUpdatedCoords(serverMove, serverUpdatedCoords);
-        } while (true); //keep playing until someone loses or wins
+                sendServerUpdatedCoords(serverMove, serverUpdatedCoords);
+            } while (true); //keep playing until someone loses or wins
+        }
+        catch (Exception ex)
+        {
+            System.out.println("There was an error while running the server: " + ex.getMessage());
+        }
 
         boolean readerIsClosed = false;
         boolean writerIsClosed = false;
