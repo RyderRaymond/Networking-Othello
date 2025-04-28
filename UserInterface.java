@@ -20,10 +20,11 @@ public class UserInterface extends JFrame implements KeyListener {
     private JLabel instructions; // tells controls
     private JLabel serverMessage; // displays win/loss/waiting
     private Checker chk; // checker
+    private ClientPlayer client; // the client for sending things
 
 
     // constructor
-    public UserInterface() {
+    public UserInterface(ClientPlayer cliPlay) {
         boardState = new int[][] {
             {0,0,0,0,0,0,0,0},
             {0,0,0,0,0,0,0,0},
@@ -94,6 +95,7 @@ public class UserInterface extends JFrame implements KeyListener {
             // call checker
             if (chk.checkValidity(cursor)) {
                 // send coordinates
+                client.sendPlayerMove(cursor);
 
             } else {
                 changeServerMessage("Invalid Move...Try Again");
