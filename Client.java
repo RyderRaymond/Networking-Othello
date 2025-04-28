@@ -65,14 +65,15 @@ public class Client {
                 for (int[] move : moves) {
                     System.out.println(move[0] + ", " + move[1]);
                 }
+                OthelloPlayer.printBoard(othelloPlayer.getBoard());
                 if (OthelloPlayer.getMoves(othelloPlayer.getBoard(), color).get(0)[0] == -1) {
                     ui.changeServerMessage("No valid moves available. Waiting for opponent...");
-                    sendPlayerMove(new int[]{-1, -1});
+                    sendPlayerMove(new int[]{-1, 0});
                 }
 
                 ArrayList<int[]> clientUpdatedCoords = receiveClientUpdatedCoords();
                 checkGameOver(clientUpdatedCoords.get(0));
-                OthelloPlayer.updateBoard(othelloPlayer.getBoard(), clientUpdatedCoords);
+                othelloPlayer.updateBoard(clientUpdatedCoords);
 
                 int[][] updatedCoords = new int[clientUpdatedCoords.size()][clientUpdatedCoords.get(0).length];
                 for (int i = 0; i < clientUpdatedCoords.size(); i++)
@@ -85,7 +86,7 @@ public class Client {
 
                 ArrayList<int[]> serverUpdatedCoords = receiveServerUpdatedCoords();
                 checkGameOver(serverUpdatedCoords.get(0));
-                OthelloPlayer.updateBoard(othelloPlayer.getBoard(), serverUpdatedCoords);
+                othelloPlayer.updateBoard(serverUpdatedCoords);
 
                 int[][] serverUpdatedCoordsArray = new int[serverUpdatedCoords.size()][serverUpdatedCoords.get(0).length];
                 for (int i = 0; i < serverUpdatedCoords.size(); i++)
