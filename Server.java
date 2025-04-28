@@ -76,31 +76,29 @@ class ServerThread extends Thread {
 
         try {
             do {
+                //Get player Move -----------------------------------
                 playerCoord = getPlayerMove();
 
+                // Process Player Last Move -------------------------------------------
                 // Check if last move was pass and player move is pass then game is over
-                if (Arrays.equals(lastMove, noValidMove) && Arrays.equals(playerCoord, noValidMove)) {
+                if (Arrays.equals(playerCoord, noValidMove) && Arrays.equals(lastMove, noValidMove)) {
                     // end game logic
                     endGame();
                     break;
                 }
-
-                ArrayList<int[]> playerUpdatedCoords = new ArrayList<>();
-                if (!Arrays.equals(playerCoord, noValidMove)) {
-                    playerUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), playerCoord, Color.PLAYER);
+                else if (Arrays.equals(playerCoord, noValidMove)) {
+                    sendCoordOrNotification(noValidMove);
                 }
                 else {
-                    playerUpdatedCoords.add(new int[] {-1, 0, 0});
+                    ArrayList<int[]> playerUpdatedCoords = new ArrayList<>();
+                    playerUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), playerCoord, Color.PLAYER);
+                    aiPlayer.updateBoard(playerUpdatedCoords);
+                    sendClientUpdatedCoords(playerUpdatedCoords);
                 }
 
-                if (playerUpdatedCoords.get(0)[0] != -1) {
-                    aiPlayer.updateBoard(playerUpdatedCoords);
-                }
                 OthelloPlayer.printBoard(aiPlayer.getBoard());
 
-                // Send playerUpdatedCoords to player
-                sendClientUpdatedCoords(playerCoord, playerUpdatedCoords);
-
+                // Sleep to allow the user to see how their board has updated
                 try {
                     Thread.sleep(sleepTimeAfterSendUpdate);
                 } catch (InterruptedException ex) {
@@ -113,23 +111,26 @@ class ServerThread extends Thread {
                 System.out.println("Server move: " + serverMove[0] + "," + serverMove[1]);
                 lastMove = serverMove;
 
+
                 if (Arrays.equals(serverMove, noValidMove) && Arrays.equals(playerCoord, noValidMove)) {
                     endGame();
                     break;
                 }
-                else if (!Arrays.equals(serverMove, noValidMove))
+                else if (Arrays.equals(serverMove, noValidMove))
                 {
                     //OthelloPlayer.printBoard(aiPlayer.getBoard());
-                    ArrayList<int[]> serverUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), serverMove, Color.AI);
+//                    ArrayList<int[]> serverUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), serverMove, Color.AI);
                     //OthelloPlayer.printChanges(serverUpdatedCoords);
-                    aiPlayer.updateBoard(serverUpdatedCoords);
+//                    aiPlayer.updateBoard(serverUpdatedCoords);
                     //OthelloPlayer.printBoard(aiPlayer.getBoard());
-                    sendServerUpdatedCoords(serverMove, serverUpdatedCoords);
+//                    sendServerUpdatedCoords(serverMove, serverUpdatedCoords);
+                    sendCoordOrNotification(noValidMove);
                 }
                 else {
-                    ArrayList<int[]> serverUpdatedCoords = new ArrayList<>();
-                    serverUpdatedCoords.add(new int[] {-1, 0, 1});
-                    sendServerUpdatedCoords(serverMove, serverUpdatedCoords);
+                    ArrayList<int[]> serverUpdatedCoords = OthelloPlayer.place(aiPlayer.getBoard(), serverMove, Color.AI);
+                    aiPlayer.updateBoard(serverUpdatedCoords);
+                    sendCoordOrNotification(serverMove);
+                    sendServerUpdatedCoords(serverUpdatedCoords);
                 }
             } while (true); //keep playing until someone loses or wins
         }
@@ -193,8 +194,7 @@ class ServerThread extends Thread {
     // and then determine if that is a valid coordinate or if it is a notification that someone has won.
     // If someone won, display who won
     // If no one won and this is a real coordinate, display the coordinates changed
-    private void sendClientUpdatedCoords(int[] playerMoveAgain, ArrayList<int[]> coordsChanged) {
-        String playerLastMove = "" + playerMoveAgain[0] + "," + playerMoveAgain[1];
+    private void sendClientUpdatedCoords(ArrayList<int[]> coordsChanged) {
 
         String coordsToSend = parseListOfCoordinates(coordsChanged);
 
@@ -202,8 +202,6 @@ class ServerThread extends Thread {
 
 //        do {
             try {
-                writer.write(playerLastMove);
-                writer.newLine();
                 writer.write(coordsToSend);
                 writer.newLine();
                 writer.flush();
@@ -214,27 +212,25 @@ class ServerThread extends Thread {
 //        } while (!successfullySent);
     }
 
+    private void sendCoordOrNotification(int[] coord) throws IOException
+    {
+        String coordToSend = "" + coord[0] + "," + coord[1];
+        writer.write(coordToSend);
+        writer.newLine();
+        writer.flush();
+    }
+
     // When the client reads the server's updated coordinates,
-    private void sendServerUpdatedCoords(int[] serverMove, ArrayList<int[]> coordsChanged) {
-        String serverCoord = "" + serverMove[0] + ',' + serverMove[1];
-        String coordsToSend = "";
-        if (coordsChanged == null) {
-            coordsToSend = null;
-        }
-        else {
-            coordsToSend = parseListOfCoordinates(coordsChanged);
-        }
+    private void sendServerUpdatedCoords(ArrayList<int[]> coordsChanged)
+    {
+        String coordsToSend = parseListOfCoordinates(coordsChanged);
+
 
         boolean successfullySent = true;
 //        do {
             try {
-                writer.write(serverCoord);
+                writer.write(coordsToSend);
                 writer.newLine();
-                if ( !(coordsToSend == null) ){
-                    writer.write(coordsToSend);
-                    writer.newLine();
-                }
-
                 writer.flush();
             }
             catch (IOException ex) {
@@ -331,7 +327,7 @@ class ServerThread extends Thread {
         };
 
         //Send the coordinate as "-1,0" for example
-        String stringToWrite = "" + winnerCoord[0] + "," + winnerCoord[1] + ",1";
+        String stringToWrite = "" + winnerCoord[0] + "," + winnerCoord[1];
         System.out.println("Sending: " + stringToWrite);
         boolean sentWinner = false;
 
