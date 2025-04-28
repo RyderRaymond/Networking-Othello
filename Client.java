@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Client {
@@ -9,6 +10,11 @@ public class Client {
     private BufferedReader reader;
     private OthelloPlayer othelloPlayer;
     private UserInterface ui;
+
+    private static final int[] noValidMove = new int[] {-1, 0};
+    private static final int[] playerLoses = new int[] {-1, -1};
+    private static final int[] playerWins = new int[] {-1, -2};
+    private static final int[] tie = new int[] {-1, -3};
 
     public Client(Socket socket, BufferedWriter writer, BufferedReader reader)
     {
@@ -86,13 +92,18 @@ public class Client {
 
                 ArrayList<int[]> serverUpdatedCoords = receiveServerUpdatedCoords();
                 checkGameOver(serverUpdatedCoords.get(0));
-                othelloPlayer.updateBoard(serverUpdatedCoords);
+
+                if (serverUpdatedCoords.get(0)[0] != -1) {
+                    othelloPlayer.updateBoard(serverUpdatedCoords);
+                }
 
                 int[][] serverUpdatedCoordsArray = new int[serverUpdatedCoords.size()][serverUpdatedCoords.get(0).length];
                 for (int i = 0; i < serverUpdatedCoords.size(); i++)
                 {
                     serverUpdatedCoordsArray[i] = serverUpdatedCoords.get(i).clone();
                 }
+
+                
                 ui.receiveServerMessage(serverUpdatedCoordsArray);
 
 //            othelloPlayer.updateBoard(serverUpdatedCoords);
