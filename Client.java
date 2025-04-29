@@ -126,16 +126,10 @@ public class Client {
         catch (Exception ex)
         {
             System.out.println("An error occurred during the connection: " + ex.getMessage());
+            ui.changeServerMessage("An error occurred. Please exit the program");
         }
         finally {
             try {
-                try {
-                    Thread.sleep(5 * 1000);
-                }
-                catch (Exception ex) {
-
-                }
-                ui.dispose();
                 socket.close();
                 writer.close();
                 reader.close();
