@@ -123,12 +123,13 @@ public class Client {
 //            ui.receiveServerMessage((int[][]) serverUpdatedCoords.toArray());
             }
         }
-        catch (IOException ex)
+        catch (Exception ex)
         {
             System.out.println("An error occurred during the connection: " + ex.getMessage());
         }
         finally {
             try {
+                ui.dispose();
                 socket.close();
                 writer.close();
                 reader.close();
