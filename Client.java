@@ -129,6 +129,12 @@ public class Client {
         }
         finally {
             try {
+                try {
+                    Thread.sleep(5 * 1000);
+                }
+                catch (Exception ex) {
+
+                }
                 ui.dispose();
                 socket.close();
                 writer.close();
