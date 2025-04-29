@@ -49,7 +49,7 @@ public class Server {
 }
 
 class ServerThread extends Thread {
-    private static final int sleepTimeAfterSendUpdate = 5 * 1000; //5 seconds (5 * 1000 milliseconds)
+    private static final int sleepTimeAfterSendUpdate = 3 * 1000; //5 seconds (5 * 1000 milliseconds)
 
     private static final int[] noValidMove = new int[] {-1, 0};
     private static final int[] playerLoses = new int[] {-1, -1};
