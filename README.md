@@ -17,10 +17,10 @@ VIMN'T Othello is an Othello game that allows players to compete against an AI o
 
 ## How to Use
 
-1. **Compile and run Server.java, it will ask you to enter the port on which to listen. Enter an open port.
+1. **Compile and run Server.java,** it will ask you to enter the port on which to listen. Enter an open port.
 
-2. **To play against the server, compile and run Client.java. It will ask you which host to connect to. If you are running the client on the same computer as the server, type localhost, if not, type the IP address of the computer that the server is being run on. Then, when it prompts you to enter port the server is listening on, enter the port that the server is listening on.
+2. **To play against the server,** compile and run Client.java. It will ask you which host to connect to. If you are running the client on the same computer as the server, type localhost, if not, type the IP address of the computer that the server is being run on. Then, when it prompts you to enter port the server is listening on, enter the port that the server is listening on.
 
-3. **Proceed to play the game against the AI.
+3. **Proceed to play the game against the AI.**
 
 Note: To swap the AI to easy mode, comment out line 111 of Server.java and uncomment 110.
