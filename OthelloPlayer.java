@@ -73,9 +73,9 @@ public class OthelloPlayer {
     if (moves.get(0)[0] == -1) return 0; // No valid moves available
     for (int[] move : moves) {
       int outcome = 0;
-      if(isCorner(move)) outcome += 30; // Corner captured
+      if(isCorner(move)) outcome += 50; // Corner captured
       if(isEdge(move)) outcome += 5; // Edge captured
-      if(isNextToCorner(move)) outcome -= 15; // Next to corner
+      if(isNextToCorner(move)) outcome -= 30; // Next to corner
       Color[][] newBoard = deepCopyBoard(board);
       ArrayList<int[]> changes = place(newBoard, move, color); // get changed tiles
       newBoard = updateBoard(newBoard, changes); // update the board
